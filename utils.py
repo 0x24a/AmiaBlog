@@ -1,7 +1,9 @@
-from typing import Literal
+from typing import Literal, Tuple
 from pydantic import BaseModel
 from fastapi.responses import HTMLResponse
 from jinja2 import Environment, FileSystemLoader
+from datetime import datetime
+import yaml
 
 class SiteSettings(BaseModel):
     title: str
@@ -16,6 +18,15 @@ class Config(BaseModel):
     
     # Debug flags
     disable_template_cache: bool = False
+
+class PostMetadata(BaseModel):
+    title: str
+    date: datetime
+    last_modified: datetime
+    tags: list[str]
+    description: str
+    published: bool
+    author: str
 
 def load_config(filename: str = "config.json") -> Config:
     with open(filename, "r") as f:
@@ -32,4 +43,27 @@ class TemplateRenderer:
         if self.disable_cache or template_name not in self.templates:
             self.templates[template_name] = self.env.get_template(template_name)
         return HTMLResponse(self.templates[template_name].render(**context))
+
+def parse_post(content: str) -> Tuple[PostMetadata, str]:
+    """
+    Parses a post from its content.
     
+    Args:
+        content (str): The content of the post.
+    
+    Returns:
+        Tuple[PostMetadata, str]: A tuple containing the metadata and the rest content of the post (hopefully) in markdown.
+    """
+    metadata_lines = []
+    content_lines = []
+    metadata_end = False
+    for line in content.split("\n"):
+        if line == "---":
+            metadata_end = True
+            continue
+        if not metadata_end:
+            metadata_lines.append(line)
+        else:
+            content_lines.append(line)
+    metadata = PostMetadata.model_validate(yaml.safe_load("\n".join(metadata_lines)))
+    return metadata, "\n".join(content_lines)
