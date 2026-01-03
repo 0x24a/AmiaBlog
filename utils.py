@@ -2,7 +2,7 @@ from typing import List, Literal, Tuple
 from pydantic import BaseModel
 from fastapi.responses import HTMLResponse
 from jinja2 import Environment, FileSystemLoader
-from datetime import datetime
+import datetime
 import yaml
 import os
 
@@ -22,8 +22,8 @@ class Config(BaseModel):
 
 class PostMetadata(BaseModel):
     title: str
-    date: datetime
-    last_modified: datetime
+    date: datetime.date
+    last_modified: datetime.date
     tags: list[str]
     description: str
     published: bool
@@ -71,12 +71,7 @@ def parse_post(content: str) -> Tuple[PostMetadata, str]:
             metadata_lines.append(line)
         else:
             content_lines.append(line)
-    metadata_json = yaml.safe_load("\n".join(metadata_lines))
-    metadata_json.update({
-        "time": datetime.strptime(metadata_json["time"], "%Y-%m-%d"),
-        "last_modified": datetime.strptime(metadata_json["last_modified"], "%Y-%m-%d")
-    })
-    metadata = PostMetadata.model_validate(metadata_json)
+    metadata = PostMetadata.model_validate(yaml.safe_load("\n".join(metadata_lines)))
     return metadata, "\n".join(content_lines)
 
 class PostsManager:
