@@ -1,3 +1,4 @@
+from typing import Literal
 from pydantic import BaseModel
 from fastapi.responses import HTMLResponse
 from jinja2 import Environment, FileSystemLoader
@@ -7,6 +8,7 @@ class SiteSettings(BaseModel):
     description: str
     keywords: str
     color_scheme: str = "DDAACC"
+    theme: Literal['auto', 'light', 'dark'] = "auto"
 
 class Config(BaseModel):
     site_settings: SiteSettings
