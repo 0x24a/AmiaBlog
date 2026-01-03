@@ -2,7 +2,8 @@
   "site_settings": {
     "title": "AmiaBlog",
     "description": "A simple blog made with FastAPI & MDUIv2",
-    "keywords": "amiablog, blog, fastapi, jinja2"
+    "keywords": "amiablog, blog, fastapi, jinja2",
+    "theme_color": "DDAACC"
   },
   "site_language": "en",
   "disable_template_cache": true
