@@ -6,7 +6,7 @@ class SiteSettings(BaseModel):
     title: str
     description: str
     keywords: str
-    theme_color: str = "DDAACC"
+    color_scheme: str = "DDAACC"
 
 class Config(BaseModel):
     site_settings: SiteSettings
