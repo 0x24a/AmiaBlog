@@ -1,4 +1,7 @@
 {
   "recent_posts": "Recent Posts",
-  "no_recent_posts": "No recent posts."
+  "no_recent_posts": "No recent posts.",
+  "total_posts": "This blog has {} post(s).",
+  "powered_by": "Powered by AmiaBlog (Version {}), A simple blog system built with FastAPI & MDUIv2.",
+  "github_repo": "Github repository"
 }

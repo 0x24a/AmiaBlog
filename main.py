@@ -18,7 +18,7 @@ __VERSION__ = "0.1.0"
 @app.get("/")
 async def mainpage():
     return renderer.render(
-        "index.html", config=config, recent_posts=posts_manager.recent_posts(), i18n=i18n
+        "index.html", config=config, recent_posts=posts_manager.recent_posts(), i18n=i18n, backend_version=__VERSION__, total_posts=len(posts_manager.posts)
     )
 
 
