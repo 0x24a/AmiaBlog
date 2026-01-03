@@ -21,6 +21,12 @@ async def mainpage():
         "index.html", config=config, recent_posts=posts_manager.recent_posts(), i18n=i18n, backend_version=__VERSION__, total_posts=len(posts_manager.posts)
     )
 
+@app.get("/post/{slug}")
+async def view_post(slug: str):
+    return renderer.render(
+        "post.html", config=config, post=posts_manager.posts.get(slug), i18n=i18n, backend_version=__VERSION__
+    )
+
 
 @app.get("/api/health")
 async def root():
