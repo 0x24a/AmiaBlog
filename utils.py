@@ -1,10 +1,11 @@
-from typing import List, Literal, Tuple
+from typing import List, Literal, Optional, Tuple
 from pydantic import BaseModel
 from fastapi.responses import HTMLResponse
 from jinja2 import Environment, FileSystemLoader
 import datetime
 import yaml
 import os
+import json
 
 
 class SiteSettings(BaseModel):
@@ -103,3 +104,31 @@ class PostsManager:
             self.posts.items(), key=lambda x: x[1].metadata.last_modified, reverse=True
         )[:n]
         return [post for _, post in sorted_items]
+
+class I18nTerm:
+    def __init__(self, key: str, term: Optional[str]):
+        self.key = key
+        self.term = term
+    
+    def __str__(self):
+        return self.term if self.term is not None else f"<untranslated {self.key}>"
+    
+    def __repr__(self):
+        return f"I18nTerm({self.key}, {self.term})"
+    
+    def format(self, *args, **kwargs):
+        return self.term.format(*args, **kwargs) if self.term is not None else f"<untranslated {self.key}>"
+
+class I18nProvider:
+    def __init__(self, language: str = "en") -> None:
+        self.language = language
+        self.translations = {}
+        self.load_translations()
+
+    def load_translations(self) -> None:
+        with open(f"languages/{self.language}.json", "r") as f:
+            terms = json.load(f)
+        self.translations = {key: I18nTerm(key, term) for key, term in terms.items()}
+    
+    def __getattr__(self, key: str) -> I18nTerm:
+        return self.translations.get(key, I18nTerm(key, None))
