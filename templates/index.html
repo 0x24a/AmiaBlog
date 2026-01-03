@@ -8,12 +8,25 @@
     <meta name="keywords" content="{{ config.site_settings.keywords }}">
 
     <link rel="stylesheet" href="/static/mdui_2.1.4/mdui.css">
+    <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+    
+    @import url('/static/roboto/roboto.css');
+    </style>
     <script src="/static/mdui_2.1.4/mdui.global.js"></script>
     <!-- Include the icon's CSS file if using the icon attribute -->
 
     <title>{{ config.site_settings.title }}</title>
   </head>
   <body>
+      <mdui-top-app-bar>
+        <mdui-button-icon icon="menu"></mdui-button-icon>
+        <mdui-top-app-bar-title>{{ config.site_settings.title }}</mdui-top-app-bar-title>
+        <div style="flex-grow: 1"></div>
+        <mdui-button-icon icon="more_vert"></mdui-button-icon>
+      </mdui-top-app-bar>
       <script>mdui.setColorScheme('{{ config.site_settings.color_scheme }}')</script>
   </body>
 </html>
