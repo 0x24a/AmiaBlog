@@ -24,7 +24,7 @@ async def mainpage():
 @app.get("/post/{slug}")
 async def view_post(slug: str):
     return renderer.render(
-        "post.html", config=config, post=posts_manager.posts.get(slug), i18n=i18n, backend_version=__VERSION__
+        "post.html", config=config, post=posts_manager.posts.get(slug), i18n=i18n, backend_version=__VERSION__, total_posts=len(posts_manager.posts)
     )
 
 

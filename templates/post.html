@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no"/>
     <meta name="renderer" content="webkit"/>
     <meta name="description" content="{{ post.metadata.description }}">
-    <meta name="keywords" content="{{ config.site_settings.keywords }}, {{ post.metadata.tags }}">
+    <meta name="keywords" content="{{ config.site_settings.keywords }}, {{ ', '.join(post.metadata.tags) }}">
 
     <link rel="stylesheet" href="/static/mdui_2.1.4/mdui.css">
     <style>
@@ -16,6 +16,8 @@
     @import url('/static/roboto/roboto.css');
     </style>
     <script src="/static/mdui_2.1.4/mdui.global.js"></script>
+    <script src="/static/markdown-it-14.1.0.min.js"></script>
+    <script src="/static/markdown-it-footnote-4.0.0.min.js"></script>
     <link rel="stylesheet" href="/static/material_icons/material_icons.css">
 
     <title>{{ post.metadata.title }} - {{ config.site_settings.title }}</title>
@@ -50,8 +52,10 @@
           <br>
           <mdui-divider></mdui-divider>
           <br>
-          <pre>{{ post.content }}</pre>
+          <br>
+          <div id="markdown-render-result" class="mdui-prose">Rendering...</div>
       </div>
+      <pre style="display: none;" id="post-content">{{ post.content }}</pre>
       <mdui-dialog id="about" close-on-esc close-on-overlay-click>
             <p style="font-size: x-large;">{{ config.site_settings.title }}</p>
             <p>{{ config.site_settings.description }}</p>
@@ -63,6 +67,16 @@
             <p><a href="https://github.com/0x24a/AmiaBlog" target="_blank">{{ i18n.github_repo }}</a></p>
             <br>
       </mdui-dialog>
-      <script>mdui.setColorScheme('{{ config.site_settings.color_scheme }}')</script>
+      <script>
+      mdui.setColorScheme('{{ config.site_settings.color_scheme }}');
+      const md = window.markdownit({
+        html: true,
+        linkify: true,
+        typographer: true,
+        breaks: true
+      }).use(window.markdownitFootnote);
+      const result = md.render(mdui.$('#post-content')[0].innerHTML);
+      mdui.$('#markdown-render-result')[0].innerHTML=result;
+      </script>
   </body>
 </html>

@@ -6,6 +6,11 @@ description: A test post for AmiaBlog's testing purposes.
 published: true
 author: AmiaBlog
 ---
-This is a test post, for AmiaBlog's testing purposes.  
-`markdown` and $\LaTeX$ are supported.  
-$$E = mc^2$$
+### Very unfunni serious title
+
+This is a test post, for AmiaBlog's testing purposes[^1].
+
+[^1]: A funni footnote
+
+`markdown` is supported.
+but not LaTeX because markdown-it-katex has some security issues and hasn't been updated in like 2 or 3 million years.
