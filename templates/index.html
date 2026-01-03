@@ -51,9 +51,10 @@
           <br><br>
           {% endfor %}
           {% if not recent_posts %}
-              <p>No recent posts.</p>
+              <p>{{ i18n.no_recent_posts }}</p>
           {% endif %}
       </div>
+      
       <script>mdui.setColorScheme('{{ config.site_settings.color_scheme }}')</script>
   </body>
 </html>
