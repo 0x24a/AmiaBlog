@@ -1,9 +1,10 @@
-from typing import Literal, Tuple
+from typing import List, Literal, Tuple
 from pydantic import BaseModel
 from fastapi.responses import HTMLResponse
 from jinja2 import Environment, FileSystemLoader
 from datetime import datetime
 import yaml
+import os
 
 class SiteSettings(BaseModel):
     title: str
@@ -67,3 +68,20 @@ def parse_post(content: str) -> Tuple[PostMetadata, str]:
             content_lines.append(line)
     metadata = PostMetadata.model_validate(yaml.safe_load("\n".join(metadata_lines)))
     return metadata, "\n".join(content_lines)
+
+class PostsManager:
+    def __init__(self, posts_dir: str = "posts") -> None:
+        self.posts_dir = posts_dir
+        self.posts = {}
+    
+    def load_posts(self) -> None:
+        for filename in os.listdir(self.posts_dir):
+            if filename.endswith(".md"):
+                with open(os.path.join(self.posts_dir, filename), "r") as f:
+                    content = f.read()
+                metadata, content = parse_post(content)
+                self.posts[".".join(filename.split(".")[:-1])] = metadata, content
+    
+    def recent_posts(self, n: int = 5) -> List[Tuple[str, PostMetadata, str]]:
+        sorted_items = sorted(self.posts.items(), key=lambda x: x[1][0].last_modified, reverse=True)[:n]
+        return [(key, metadata, content) for key, (metadata, content) in sorted_items]
