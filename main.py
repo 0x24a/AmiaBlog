@@ -1,6 +1,8 @@
-def main():
-    print("Hello from amiablog!")
+from fastapi import FastAPI
 
+app = FastAPI()
+__VERSION__ = "0.1.0"
 
-if __name__ == "__main__":
-    main()
+@app.get("/")
+async def root():
+    return {"status": "ok", "server": "AmiaBlog", "version": __VERSION__}
