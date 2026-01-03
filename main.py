@@ -12,9 +12,13 @@ posts_manager.load_posts()
 
 __VERSION__ = "0.1.0"
 
+
 @app.get("/")
 async def mainpage():
-    return renderer.render("index.html", config=config, recent_posts=posts_manager.recent_posts())
+    return renderer.render(
+        "index.html", config=config, recent_posts=posts_manager.recent_posts()
+    )
+
 
 @app.get("/api/health")
 async def root():
