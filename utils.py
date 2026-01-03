@@ -29,6 +29,11 @@ class PostMetadata(BaseModel):
     published: bool
     author: str
 
+class Post(BaseModel):
+    metadata: PostMetadata
+    content: str
+    slug: str
+
 def load_config(filename: str = "config.json") -> Config:
     with open(filename, "r") as f:
         return Config.model_validate_json(f.read())
@@ -66,7 +71,12 @@ def parse_post(content: str) -> Tuple[PostMetadata, str]:
             metadata_lines.append(line)
         else:
             content_lines.append(line)
-    metadata = PostMetadata.model_validate(yaml.safe_load("\n".join(metadata_lines)))
+    metadata_json = yaml.safe_load("\n".join(metadata_lines))
+    metadata_json.update({
+        "time": datetime.strptime(metadata_json["time"], "%Y-%m-%d"),
+        "last_modified": datetime.strptime(metadata_json["last_modified"], "%Y-%m-%d")
+    })
+    metadata = PostMetadata.model_validate(metadata_json)
     return metadata, "\n".join(content_lines)
 
 class PostsManager:
@@ -80,8 +90,9 @@ class PostsManager:
                 with open(os.path.join(self.posts_dir, filename), "r") as f:
                     content = f.read()
                 metadata, content = parse_post(content)
-                self.posts[".".join(filename.split(".")[:-1])] = metadata, content
+                slug = ".".join(filename.split(".")[:-1])
+                self.posts[slug] = Post(metadata=metadata, content=content, slug=slug)
     
-    def recent_posts(self, n: int = 5) -> List[Tuple[str, PostMetadata, str]]:
-        sorted_items = sorted(self.posts.items(), key=lambda x: x[1][0].last_modified, reverse=True)[:n]
-        return [(key, metadata, content) for key, (metadata, content) in sorted_items]
+    def recent_posts(self, n: int = 5) -> List[Post]:
+        sorted_items = sorted(self.posts.items(), key=lambda x: x[1].metadata.last_modified, reverse=True)[:n]
+        return [post for _, post in sorted_items]
