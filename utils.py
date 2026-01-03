@@ -6,11 +6,11 @@ class SiteSettings(BaseModel):
     title: str
     description: str
     keywords: str
+    theme_color: str = "DDAACC"
 
 class Config(BaseModel):
     site_settings: SiteSettings
     site_language: str
-    theme_color: str = "DDAACC"
     
     # Debug flags
     disable_template_cache: bool = False

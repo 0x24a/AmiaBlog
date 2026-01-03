@@ -1,7 +1,10 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from utils import load_config, TemplateRenderer
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 config = load_config()
 renderer = TemplateRenderer(disable_cache=config.disable_template_cache)
 
