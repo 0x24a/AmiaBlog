@@ -1,0 +1,9 @@
+/*!
+  Theme: Amiablog
+  Description: Highlight.js theme adapted to MDUIv2's dynamic theme
+  Author: (c) 0x24a <https://github.com/0x24a>
+  Maintainer: 0x24a <https://github.com/0x24a>
+  Website: https://github.com/0x24a/AmiaBlog
+  License: see project LICENSE
+  Touched: 2026
+*/pre code.hljs{display:block;overflow-x:auto;padding:1em}code.hljs{padding:3px 5px}.hljs{background:rgb(var(--mdui-color-on-background));color:rgb(var(--mdui-color-surface-container-highest))}.hljs-comment{color:rgb(var(--mdui-color-surface-variant))}.hljs-punctuation,.hljs-tag{color:rgb(var(--mdui-color-surface-container-highest))}.hljs-tag .hljs-attr,.hljs-tag .hljs-name{color:rgb(var(--mdui-color-surface-container-highest))}.hljs-attribute,.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-name,.hljs-selector-tag{font-weight:700; color:rgb(var(--mdui-color-surface-tint-color))}.hljs-deletion,.hljs-number,.hljs-quote,.hljs-selector-class,.hljs-selector-id,.hljs-string,.hljs-template-tag,.hljs-type{color:rgb(var(--mdui-color-error))}.hljs-section,.hljs-title{color:rgb(var(--mdui-color-error));font-weight:700}.hljs-link,.hljs-operator,.hljs-regexp,.hljs-selector-attr,.hljs-selector-pseudo,.hljs-symbol,.hljs-template-variable,.hljs-variable{color:rgb(var(--mdui-color-error))}.hljs-literal{color:rgb(var(--mdui-color-primary))}.hljs-addition,.hljs-built_in,.hljs-bullet,.hljs-code{color:rgb(var(--mdui-color-primary))}.hljs-meta{color:rgb(var(--mdui-color-tertiary))}.hljs-meta .hljs-string{color:rgb(var(--mdui-color-tertiary-container))}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:700}

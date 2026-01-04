@@ -18,7 +18,34 @@
     <script src="/static/mdui_2.1.4/mdui.global.js"></script>
     <script src="/static/markdown-it-14.1.0.min.js"></script>
     <script src="/static/markdown-it-footnote-4.0.0.min.js"></script>
+    {% if hljs_languages %}
+    <link rel="stylesheet" href="/static/hljs_11.1.1/amiablog.min.css">
+    <script src="/static/hljs_11.1.1/highlight.min.js"></script>
+    {% for language in hljs_languages %}
+    <script src="/static/hljs_11.1.1/{{ language }}.min.js"></script>
+    {% endfor %}
+    {% endif %}
     <link rel="stylesheet" href="/static/material_icons/material_icons.css">
+    <style>
+    #markdown-render-result pre {
+        width: 90%;
+        overflow-x: auto;
+        background-color: rgb(var(--mdui-color-surface-container-highest));
+        padding: 1rem;
+        padding-right: calc(10% - 1rem);
+        border-radius: 0.5rem;
+        margin: 1rem 0;
+        white-space: pre;
+        word-wrap: normal;
+    }
+
+    #markdown-render-result pre code {
+        background-color: rgb(var(--mdui-color-surface-container-highest));
+        display: block;
+        overflow-x: auto;
+        padding: 0;
+    }
+    </style>
 
     <title>{{ post.metadata.title }} - {{ config.site_settings.title }}</title>
   </head>
@@ -69,14 +96,22 @@
       </mdui-dialog>
       <script>
       mdui.setColorScheme('{{ config.site_settings.color_scheme }}');
+      function unescapeHtml(escapedStr) {
+          var elem = document.createElement('textarea');
+          elem.innerHTML = escapedStr;
+          return elem.value;
+      }
       const md = window.markdownit({
         html: true,
         linkify: true,
         typographer: true,
         breaks: true
       }).use(window.markdownitFootnote);
-      const result = md.render(mdui.$('#post-content')[0].innerHTML);
+      const result = md.render(unescapeHtml(mdui.$('#post-content')[0].innerHTML));
       mdui.$('#markdown-render-result')[0].innerHTML=result;
       </script>
+      {% if hljs_languages %}
+      <script>hljs.highlightAll();</script>
+      {% endif %}
   </body>
 </html>

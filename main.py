@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from utils import load_config, TemplateRenderer, PostsManager, I18nProvider
+from utils import load_config, TemplateRenderer, PostsManager, I18nProvider, HLJSLanguageManager
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 config = load_config()
 renderer = TemplateRenderer(disable_cache=config.disable_template_cache)
+hljs_manager = HLJSLanguageManager(config.site_settings.hljs_languages)
 posts_manager = PostsManager()
 posts_manager.load_posts()
 
@@ -23,8 +24,13 @@ async def mainpage():
 
 @app.get("/post/{slug}")
 async def view_post(slug: str):
+    post = posts_manager.posts.get(slug)
+    if post is None:
+        return {"error": "Post not found"}
+    hljs_languages = hljs_manager.get_markdown_languages(post.content)
+    available_languages = [i for i in hljs_languages if i in hljs_manager.available_languages]
     return renderer.render(
-        "post.html", config=config, post=posts_manager.posts.get(slug), i18n=i18n, backend_version=__VERSION__, total_posts=len(posts_manager.posts)
+        "post.html", config=config, post=post, i18n=i18n, backend_version=__VERSION__, total_posts=len(posts_manager.posts), hljs_languages=available_languages
     )
 
 
