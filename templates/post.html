@@ -61,7 +61,7 @@
           <p style="font-size: large;">{{ post.metadata.description }}</p>
           <br>
           {% for tag in post.metadata.tags %}
-          <mdui-chip href="/tag/{{ tag }}" target="_blank">{{ tag }}</mdui-chip>&nbsp;
+          <mdui-chip href="/tag/{{ tag | urlencode }}" target="_blank">{{ tag }}</mdui-chip>&nbsp;
           {% endfor %}
           <p style="display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; color: rgb(var(--mdui-color-outline))">
             <span style="display: inline-flex; align-items: center; gap: 0.25rem;">

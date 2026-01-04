@@ -37,8 +37,6 @@ async def view_post(slug: str):
 
 @app.get("/tag/{tag:str}")
 async def view_tag(tag: str):
-    if "<" in tag or ">" in tag:
-        raise HTTPException(status_code=403, detail="touch some grass bro")
     posts = posts_manager.order_by(posts_manager.get_posts_by_tag(tag), "modified_desc")
     return renderer.render(
         "tag.html", config=config, posts=posts, i18n=i18n, backend_version=__VERSION__, total_posts=len(posts_manager.posts), tag=tag, copyright=config.copyright

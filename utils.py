@@ -1,12 +1,14 @@
 from typing import Callable, List, Literal, Optional, Tuple, Dict
 from pydantic import BaseModel
 from fastapi.responses import HTMLResponse
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+from markupsafe import Markup
 import datetime
 import yaml
 import os
 import httpx
 import json
+from urllib.parse import quote
 
 
 class SiteSettings(BaseModel):
@@ -57,7 +59,8 @@ class TemplateRenderer:
     ) -> None:
         self.template_dir = template_dir
         self.disable_cache = disable_cache
-        self.env = Environment(loader=FileSystemLoader(template_dir))
+        self.env = Environment(loader=FileSystemLoader(template_dir), autoescape=select_autoescape())
+        self.env.filters['urlencode'] = lambda s: quote(s, safe='')
         self.templates = {}
 
     def render(self, template_name: str, **context) -> HTMLResponse:
@@ -156,7 +159,10 @@ class I18nTerm:
         return f"I18nTerm({self.key}, {self.term})"
     
     def format(self, *args, **kwargs):
-        return self.term.format(*args, **kwargs) if self.term is not None else f"<untranslated {self.key}>"
+        if self.term is None:
+            return f"<untranslated {self.key}>"
+        # Use Markup.format which automatically escapes arguments
+        return Markup(self.term).format(*args, **kwargs)
 
 class I18nProvider:
     def __init__(self, language: str = "en") -> None:
