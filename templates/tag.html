@@ -18,7 +18,7 @@
     <script src="/static/mdui_2.1.4/mdui.global.js"></script>
     <link rel="stylesheet" href="/static/material_icons/material_icons.css">
 
-    <title>{{ config.site_settings.title }}</title>
+    <title>{{ i18n.tag_search.format(tag) }} - {{ config.site_settings.title }}</title>
   </head>
   <body>
       
@@ -29,8 +29,8 @@
         <mdui-button-icon icon="more_vert" onclick="mdui.$('#about')[0].open = true"></mdui-button-icon>
       </mdui-top-app-bar>
       <div style="max-width: 90%; padding-left: 5%;">
-          <p style="font-size: x-large;">{{ i18n.recent_posts }}</p>
-          {% for post in recent_posts %}
+          <p style="font-size: x-large;">{{ i18n.tag_search.format(tag) }}</p>
+          {% for post in posts %}
           <mdui-card href="/post/{{ post.slug }}" target="_blank" variant="elevated" style="width: 100%; background-color: rgb(var(--mdui-color-surface-container));">
               <div style="padding-left: 16px; padding-right: 16px;">
                 <p style="font-size: large; font-weight: bold;">{{ post.metadata.title }}</p>
@@ -55,8 +55,8 @@
           </mdui-card>
           <br><br>
           {% endfor %}
-          {% if not recent_posts %}
-              <p>{{ i18n.no_recent_posts }}</p>
+          {% if not posts %}
+              <p>{{ i18n.search_none }}</p>
           {% endif %}
       </div>
       <mdui-dialog id="about" close-on-esc close-on-overlay-click>

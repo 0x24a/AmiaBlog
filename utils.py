@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional, Tuple, Dict
+from typing import Callable, List, Literal, Optional, Tuple, Dict
 from pydantic import BaseModel
 from fastapi.responses import HTMLResponse
 from jinja2 import Environment, FileSystemLoader
@@ -17,10 +17,14 @@ class SiteSettings(BaseModel):
     theme: Literal["auto", "light", "dark"] = "auto"
     hljs_languages: List[str] = []
 
+class CopyrightSettings(BaseModel):
+    name: str
+    refer: str
 
 class Config(BaseModel):
     site_settings: SiteSettings
     site_language: str
+    copyright: Optional[CopyrightSettings] = None
 
     # Debug flags
     disable_template_cache: bool = False
@@ -106,6 +110,37 @@ class PostsManager:
             self.posts.items(), key=lambda x: x[1].metadata.last_modified, reverse=True
         )[:n]
         return [post for _, post in sorted_items]
+    
+    def get_posts(self, selector: Callable[[Post], bool]) -> List[Post]:
+        return [post for post in self.posts.values() if selector(post)]
+    
+    def search(self, keyword: str, limit: Optional[int] = None) -> List[Post]:
+        results = self.get_posts(
+            lambda post: keyword.lower() in post.metadata.title.lower() or keyword.lower() in [tag.lower() for tag in post.metadata.tags] or keyword.lower() in post.content.lower()
+        )
+        if limit is not None:
+            results = results[:limit]
+        return results
+    
+    def get_posts_by_tag(self, tag: str, limit: Optional[int] = None) -> List[Post]:
+        results = self.get_posts(
+            lambda post: tag.lower() in [tag.lower() for tag in post.metadata.tags]
+        )
+        if limit is not None:
+            results = results[:limit]
+        return results
+    
+    def order_by(self, posts: List[Post], key: Literal["date", "date_desc", "modified", "modified_desc"]):
+        if key == "date":
+            return sorted(posts, key=lambda x: x.metadata.date)
+        elif key == "date_desc":
+            return sorted(posts, key=lambda x: x.metadata.date, reverse=True)
+        elif key == "modified":
+            return sorted(posts, key=lambda x: x.metadata.last_modified)
+        elif key == "modified_desc":
+            return sorted(posts, key=lambda x: x.metadata.last_modified, reverse=True)
+        else:
+            raise ValueError(f"Invalid key: {key}")
 
 class I18nTerm:
     def __init__(self, key: str, term: Optional[str]):

@@ -81,6 +81,17 @@
           <br>
           <br>
           <div id="markdown-render-result" class="mdui-prose">Rendering...</div>
+          <br>
+          <mdui-divider></mdui-divider>
+          <br>
+          <br>
+          {% if copyright %}
+            <div class="mdui-prose">
+                <p>{{ i18n.copyright.format(copyright.name) }}&nbsp;<a href="{{ copyright.refer }}" target="_blank">{{ i18n.copyright_refer }}</a></p>
+            </div>
+          <br>
+          <br>
+          {% endif %}
       </div>
       <pre style="display: none;" id="post-content">{{ post.content }}</pre>
       <mdui-dialog id="about" close-on-esc close-on-overlay-click>

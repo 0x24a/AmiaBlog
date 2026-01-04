@@ -30,9 +30,16 @@ async def view_post(slug: str):
     hljs_languages = hljs_manager.get_markdown_languages(post.content)
     available_languages = [i for i in hljs_languages if i in hljs_manager.available_languages]
     return renderer.render(
-        "post.html", config=config, post=post, i18n=i18n, backend_version=__VERSION__, total_posts=len(posts_manager.posts), hljs_languages=available_languages
+        "post.html", config=config, post=post, i18n=i18n, backend_version=__VERSION__, total_posts=len(posts_manager.posts), hljs_languages=available_languages, copyright=config.copyright
     )
 
+
+@app.get("/tag/{tag}")
+async def view_tag(tag: str):
+    posts = posts_manager.order_by(posts_manager.get_posts_by_tag(tag), "modified_desc")
+    return renderer.render(
+        "tag.html", config=config, posts=posts, i18n=i18n, backend_version=__VERSION__, total_posts=len(posts_manager.posts), tag=tag, copyright=config.copyright
+    )
 
 @app.get("/api/health")
 async def root():

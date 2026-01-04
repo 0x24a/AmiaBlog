@@ -3,5 +3,9 @@
   "no_recent_posts": "No recent posts.",
   "total_posts": "This blog has {} post(s).",
   "powered_by": "Powered by AmiaBlog (Version {}), A simple blog system built with FastAPI & MDUIv2.",
-  "github_repo": "Github repository"
+  "github_repo": "Github repository",
+  "copyright": "If not specified, the post is shared under {} license.",
+  "copyright_refer": "Click to view the license.",
+  "tag_search": "Posts with tag {}",
+  "search_none": "No posts found with the query."
 }

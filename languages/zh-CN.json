@@ -3,5 +3,9 @@
   "no_recent_posts": "没有最近的文章。",
   "total_posts": "共有 {} 篇文章发布于该博客。",
   "powered_by": "基于 AmiaBlog (版本 {})，一个使用 FastAPI & MDUIv2 构建的简约博客系统。",
-  "github_repo": "Github 仓库"
+  "github_repo": "Github 仓库",
+  "copyright": "如未说明，则本文使用 {} 协议共享。",
+  "copyright_refer": "点此查看协议。",
+  "tag_search": "带有标签 {} 的文章",
+  "search_none": "没有找到相关的文章。"
 }

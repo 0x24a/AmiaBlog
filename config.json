@@ -10,6 +10,10 @@
       "rust"
     ]
   },
+  "copyright": {
+    "name": "CC-BY-SA 4.0",
+    "refer": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+  },
   "site_language": "en",
   "disable_template_cache": true
 }
