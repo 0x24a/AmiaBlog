@@ -106,17 +106,19 @@ class PostsManager:
                 self.posts[slug] = Post(metadata=metadata, content=content, slug=slug)
 
     def recent_posts(self, n: int = 5) -> List[Post]:
-        sorted_items = sorted(
-            self.posts.items(), key=lambda x: x[1].metadata.last_modified, reverse=True
+        return self.order_by(
+            self.get_posts(
+                lambda post: post.metadata.published
+            ),
+            "modified_desc"
         )[:n]
-        return [post for _, post in sorted_items]
     
     def get_posts(self, selector: Callable[[Post], bool]) -> List[Post]:
         return [post for post in self.posts.values() if selector(post)]
     
     def search(self, keyword: str, limit: Optional[int] = None) -> List[Post]:
         results = self.get_posts(
-            lambda post: keyword.lower() in post.metadata.title.lower() or keyword.lower() in [tag.lower() for tag in post.metadata.tags] or keyword.lower() in post.content.lower()
+            lambda post: keyword.lower() in post.metadata.title.lower() or keyword.lower() in [tag.lower() for tag in post.metadata.tags] or keyword.lower() in post.content.lower() and post.metadata.published
         )
         if limit is not None:
             results = results[:limit]
