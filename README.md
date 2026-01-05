@@ -58,6 +58,7 @@ uv run uvicorn main:app
 - This is my side project, feel free to contribute but I can't guarantee that I'll have time to review and accept every PR.
 - Please use `black` as the code formatter.
 - Please use conventional commit messages.
+- Use keyword formatting placeholders when translating if 2 or more placeholders are in the i18n term. This is because different languages may have different word orders.
 
 Under MIT License. See [LICENSE](LICENSE) for details.
 Made with ❤️ by [0x24a](https://github.com/0x24a)
