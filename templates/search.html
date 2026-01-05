@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}{{ i18n.search_posts }} - {{ config.site_settings.title }}{% endblock %}
+
+{% block content %}
+    <p style="font-size: x-large;">{{ i18n.search_posts }}</p>
+    <br>
+    <form action="/search" method="GET">
+        <mdui-text-field label="{{ i18n.enter_keyword_here }}" helper="{{ i18n.search_keyword }}" name="query" value="{{ query }}"></mdui-text-field>
+        <br>
+        <br>
+        <mdui-select value="{{ order }}" helper="{{ i18n.search_order }}" name="order">
+          <mdui-menu-item value="relevance">{{ i18n.search_relevance }}</mdui-menu-item>
+          <mdui-menu-item value="date">{{ i18n.search_date }}</mdui-menu-item>
+          <mdui-menu-item value="date_desc">{{ i18n.search_date_desc }}</mdui-menu-item>
+          <mdui-menu-item value="modified">{{ i18n.search_modified }}</mdui-menu-item>
+          <mdui-menu-item value="modified_desc">{{ i18n.search_modified_desc }}</mdui-menu-item>
+        </mdui-select>
+        <br>
+        <br>
+        <mdui-button full-width type="submit">{{ i18n.search }}</mdui-button>
+    </form>
+    <br>
+    <br>
+    <mdui-divider></mdui-divider>
+    <br>
+    {% if finished %}
+    <p>{{ i18n.search_found_result.format(search_time=search_time, n_posts=n_posts) }}</p>
+    {% for post in posts %}
+    <mdui-card href="/post/{{ post.slug }}" target="_blank" variant="elevated" style="width: 100%; background-color: rgb(var(--mdui-color-surface-container));">
+        <div style="padding-left: 16px; padding-right: 16px;">
+          <p style="font-size: large; font-weight: bold;">{{ post.metadata.title }}</p>
+          <p>{{ post.metadata.description }}</p>
+          {% for tag in post.metadata.tags %}
+          <mdui-chip href="/tag/{{ tag | urlencode }}" target="_blank">{{ tag }}</mdui-chip>&nbsp;
+          {% endfor %}
+          <p style="display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; color: rgb(var(--mdui-color-outline))">
+            <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
+              <mdui-icon name="person"></mdui-icon> {{ post.metadata.author }}
+            </span>
+            <span>|</span>
+            <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
+              <mdui-icon name="calendar_month"></mdui-icon> {{ post.metadata.date }}
+            </span>
+            <span>|</span>
+            <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
+              <mdui-icon name="edit"></mdui-icon> {{ post.metadata.last_modified }}
+            </span>
+          </p>
+        </div>
+    </mdui-card>
+    <br><br>
+    {% endfor %}
+    {% else %}
+    <p>{{ i18n.enter_keyword_to_start }}</p>
+    {% endif %}
+{% endblock %}

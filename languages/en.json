@@ -16,5 +16,22 @@
   "search_none": "No posts found with the query.",
   "search": "Search",
   "tags": "Tags",
-  "about": "About"
+  "about": "About",
+  "search_posts": "Search Posts",
+  "search_order": "Sort by...",
+  "search_keyword": "Keyword to search",
+  "search_relevance": "Relevance (Descending)",
+  "search_date": "Date Published (Ascending)",
+  "search_date_desc": "Date Published (Descending)",
+  "search_modified": "Date Modified (Ascending)",
+  "search_modified_desc": "Date Modified (Descending)",
+  "enter_keyword_here": "Enter keyword here",
+  "enter_keyword_to_start": "Enter keyword to start searching.",
+  "search_found_result": "Found {n_posts} posts in {search_time} milliseconds.",
+  "error_title": "Error",
+  "error_occured": "AmiaBlog encountered an error.",
+  "error_desc": "Error Details: {}",
+  "error_redirect": "Redirecting you to the last page after 5 seconds...",
+  "error_relevance_in_fullmatch": "Relevance search is not available because the server is using 'fullmatch' matching method. Ask the site owner to switch to 'jieba' matching method.",
+  "error_invalid_query": "Query must be between 1 and 50 characters."
 }

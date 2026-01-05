@@ -16,5 +16,22 @@
   "search_none": "没有找到相关的文章。",
   "search": "搜索",
   "tags": "标签",
-  "about": "关于"
+  "about": "关于",
+  "search_posts": "搜索文章",
+  "search_order": "排序方式",
+  "search_keyword": "搜索关键词",
+  "search_relevance": "相关性（降序）",
+  "search_date": "发布日期（升序）",
+  "search_date_desc": "发布日期（降序）",
+  "search_modified": "修改日期（升序）",
+  "search_modified_desc": "修改日期（降序）",
+  "enter_keyword_here": "在此键入关键词",
+  "enter_keyword_to_start": "键入关键词以开始搜索。",
+  "search_found_result": "在 {search_time} 毫秒内找到了 {n_posts} 篇相关文章。",
+  "error_title": "出现错误",
+  "error_occured": "AmiaBlog 在处理该请求时发生了错误。",
+  "error_desc": "详细信息: {}",
+  "error_redirect": "您将会在 5 秒后被重定向至上一个页面...",
+  "error_relevance_in_fullmatch": "由于服务器使用 'fullmatch' 匹配模式，无法按照相关性排序。请联系站点管理员切换到 'jieba' 匹配模式。",
+  "error_invalid_query": "搜索关键词必须在 1 到 50 个字符之间。"
 }

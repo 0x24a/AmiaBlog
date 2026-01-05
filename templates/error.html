@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}{{ i18n.error_title }} - {{ config.site_settings.title }}{% endblock %}
+
+{% block content %}
+    <p style="font-size: x-large;">{{ i18n.error_occured }}</p>
+    <p>{{ i18n.error_desc.format(error) }}</p>
+    <br>
+    <mdui-divider></mdui-divider>
+    <br>
+    <div style="display: flex; align-items: center; flex-wrap: wrap;">
+        <span style="display: inline-flex; align-items: center; gap: 0.8rem;">
+            <mdui-circular-progress max="1" min="0" value="1" style="width: 1.5em; height: 1.5em;" id="progress"></mdui-circular-progress> {{ i18n.error_redirect }}
+        </span>
+    </div>
+{% endblock %}
+{% block extra_scripts %}
+    <script>
+    function updateProgress() {
+        const progress = document.getElementById('progress');
+        const duration = 5000;
+        const interval = 1000;
+        let elapsed = 0;
+
+        const update = () => {
+            elapsed += interval;
+            const progressValue = Math.max(0, 1 - (elapsed / duration));
+            progress.setAttribute('value', progressValue);
+
+            if (elapsed < duration) {
+                setTimeout(update, interval);
+            } else {
+                setTimeout(() => window.history.back(), 500);
+            }
+        };
+
+        setTimeout(update, interval);
+    }
+    
+    window.addEventListener('load', updateProgress);
+    </script>
+{% endblock %}

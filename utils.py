@@ -4,7 +4,7 @@ import os
 import sqlite3
 import time
 import jieba_fast
-from typing import Callable, Dict, List, Literal, Optional, Tuple
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
 from urllib.parse import quote
 
 import htmlmin
@@ -69,7 +69,7 @@ def load_config(filename: str = "config.json") -> Config:
 
 class TemplateRenderer:
     def __init__(
-        self, template_dir: str = "templates", disable_cache: bool = False
+        self, template_dir: str = "templates", disable_cache: bool = False, static_params: Dict[str, Any] = {}
     ) -> None:
         self.template_dir = template_dir
         self.disable_cache = disable_cache
@@ -78,12 +78,14 @@ class TemplateRenderer:
         )
         self.env.filters["urlencode"] = lambda s: quote(s, safe="")
         self.templates = {}
+        self.static_params = static_params
 
-    def render(self, template_name: str, **context) -> HTMLResponse:
+    def render(self, template_name: str, status_code: int = 200, **context) -> HTMLResponse:
         if self.disable_cache or template_name not in self.templates:
             self.templates[template_name] = self.env.get_template(template_name)
+        context.update(self.static_params)
         rendered_html = self.templates[template_name].render(**context)
-        return HTMLResponse(htmlmin.minify(rendered_html))
+        return HTMLResponse(htmlmin.minify(rendered_html), status_code=status_code)
 
 
 def parse_post(content: str) -> Tuple[PostMetadata, str]:
