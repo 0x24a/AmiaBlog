@@ -51,6 +51,18 @@
 
       <div style="max-width: 90%; padding-left: 5%;">
           {% block content %}{% endblock %}
+          {% block copyright %}
+          {% if copyright %}
+            <br>
+            <mdui-divider></mdui-divider>
+            <br>
+            <div class="mdui-prose">
+                <p>{{ i18n.copyright.format(copyright.name) }}&nbsp;<a href="{{ copyright.refer }}" target="_blank">{{ i18n.copyright_refer }}</a></p>
+            </div>
+          <br>
+          <br>
+          {% endif %}
+          {% endblock %}
       </div>
 
       <mdui-dialog id="about" close-on-esc close-on-overlay-click>
@@ -68,7 +80,7 @@
             </p>
             <br>
       </mdui-dialog>
-
+      
       {% block extra_scripts %}{% endblock %}
       <script>
       const sideNav = mdui.$('.sidenav')[0];

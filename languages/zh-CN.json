@@ -5,7 +5,7 @@
   "powered_by": "基于 AmiaBlog V{}",
   "powered_by_desc": "一个使用 FastAPI & MDUIv2 构建的简约博客系统。",
   "github_repo": "Github 仓库",
-  "copyright": "如未特别说明，则本文使用 {} 协议共享。",
+  "copyright": "如未特别说明，则本页内容使用 {} 协议共享。",
   "copyright_refer": "点此查看协议。",
   "tags_view": "标签列表",
   "tags_view_desc": "点击一个标签，以查看带有该标签的所有文章。",

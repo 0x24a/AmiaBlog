@@ -5,7 +5,7 @@
   "powered_by": "Powered by AmiaBlog V{}",
   "powered_by_desc": "A simple blog system built with FastAPI & MDUIv2.",
   "github_repo": "Github repository",
-  "copyright": "If not specified, the post is shared under {} license.",
+  "copyright": "If not specified, the page is shared under {} license.",
   "copyright_refer": "Click to view the license.",
   "tags_view": "Tags",
   "tags_view_desc": "Click on a tag to view posts with that tag.",

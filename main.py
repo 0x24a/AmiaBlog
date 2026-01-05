@@ -18,13 +18,13 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 config = load_config()
 hljs_manager = HLJSLanguageManager(config.site_settings.hljs_languages)
 posts_manager = PostsManager(search_method=config.search_method)
-posts_manager.load_posts()
 i18n = I18nProvider(config.site_language)
 renderer = TemplateRenderer(disable_cache=config.disable_template_cache, static_params={
     "config": config,
     "i18n": i18n,
     "backend_version": __VERSION__,
     "total_posts": len(posts_manager.posts),
+    "copyright": config.copyright,
 })
 
 
@@ -48,8 +48,7 @@ async def view_post(slug: str):
     return renderer.render(
         "post.html",
         post=post,
-        hljs_languages=available_languages,
-        copyright=config.copyright,
+        hljs_languages=available_languages
     )
 
 
