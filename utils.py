@@ -30,6 +30,7 @@ class Config(BaseModel):
     site_settings: SiteSettings
     site_language: str
     copyright: Optional[CopyrightSettings] = None
+    cloudflare_analytics_token: Optional[str] = None
 
     # Debug flags
     disable_template_cache: bool = False
