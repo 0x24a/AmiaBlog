@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.exceptions import HTTPException
 from utils import (
     load_config,
     TemplateRenderer,
@@ -15,7 +14,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 config = load_config()
 renderer = TemplateRenderer(disable_cache=config.disable_template_cache)
 hljs_manager = HLJSLanguageManager(config.site_settings.hljs_languages)
-posts_manager = PostsManager()
+posts_manager = PostsManager(search_method=config.search_method)
 posts_manager.load_posts()
 
 i18n = I18nProvider(config.site_language)

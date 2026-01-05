@@ -1,17 +1,19 @@
-from typing import Callable, List, Literal, Optional, Tuple, Dict
-from pydantic import BaseModel
+import datetime
+import json
+import os
+import sqlite3
+import time
+import jieba_fast
+from typing import Callable, Dict, List, Literal, Optional, Tuple
+from urllib.parse import quote
+
+import htmlmin
+import httpx
+import yaml
 from fastapi.responses import HTMLResponse
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markupsafe import Markup
-import datetime
-import yaml
-import os
-import htmlmin
-import httpx
-import sqlite3
-import time
-import json
-from urllib.parse import quote
+from pydantic import BaseModel
 
 
 class SiteSettings(BaseModel):
@@ -32,6 +34,7 @@ class Config(BaseModel):
     site_settings: SiteSettings
     site_language: str
     copyright: Optional[CopyrightSettings] = None
+    search_method: Literal["fullmatch", "jieba"] = "fullmatch"
     cloudflare_analytics_token: Optional[str] = None
 
     # Debug flags
@@ -109,13 +112,24 @@ def parse_post(content: str) -> Tuple[PostMetadata, str]:
 
 
 class PostsManager:
-    def __init__(self, posts_dir: str = "posts") -> None:
+    def __init__(self, posts_dir: str = "posts", search_method: Literal['fullmatch', 'jieba'] = 'fullmatch') -> None:
         self.posts_dir = posts_dir
         self.posts: Dict[str, Post] = {}
         self.tags: Dict[str, Tag] = {}
         self.search_index: Optional[sqlite3.Connection] = None
+        self.search_method: Literal['fullmatch', 'jieba'] = search_method
+        if self.search_method == 'jieba':
+            print("AmiaBlog | Initializing jieba predix dict")
+            jieba_fast.initialize()
+        elif self.search_method == 'fullmatch':
+            pass
+        else:
+            raise ValueError("Invalid search method.")
+        self.load_posts()
 
     def load_posts(self) -> None:
+        print("AmiaBlog | Loading posts")
+        start_time = time.time()
         for filename in os.listdir(self.posts_dir):
             if filename.endswith(".md"):
                 with open(os.path.join(self.posts_dir, filename), "r") as f:
@@ -123,8 +137,19 @@ class PostsManager:
                 metadata, content = parse_post(content)
                 slug = ".".join(filename.split(".")[:-1])
                 self.posts[slug] = Post(metadata=metadata, content=content, slug=slug)
+        end_time = time.time()
+        print(f"AmiaBlog | Loaded {len(self.posts)} posts in {(end_time - start_time)*1000:.4f}ms")
+        print("AmiaBlog | Building tag index")
+        start_time = time.time()
         self._build_tag_index()
+        end_time = time.time()
+        print(f"AmiaBlog | Built tag index in {(end_time - start_time)*1000000:.4f}us")
+        print("AmiaBlog | Building search index")
+        start_time = time.time()
         self._build_search_index()
+        end_time = time.time()
+        print(f"AmiaBlog | Built search index in {(end_time - start_time)*1000:.4f}ms")
+        print("AmiaBlog | Finished loading posts")
 
     def _build_tag_index(self):
         for post in self.posts.values():
@@ -133,19 +158,15 @@ class PostsManager:
                     self.tags[tag] = Tag(name=tag, count=1)
                 else:
                     self.tags[tag].count += 1
-    
+
     def _build_search_index(self):
-        print(f"AmiaBlog | Building search index for {len(self.posts)} posts...")
-        start_time = time.time()
         db = sqlite3.connect(":memory:")
         cursor = db.cursor()
-        cursor.execute("CREATE TABLE posts (id INTEGER PRIMARY KEY, slug TEXT, content TEXT)")
+        cursor.execute("CREATE TABLE posts (id INTEGER PRIMARY KEY, slug TEXT, title TEXT, tags TEXT, content TEXT)")
         for post in self.posts.values():
-            cursor.execute("INSERT INTO posts (slug, content) VALUES (?, ?)", (post.slug, post.content))
+            cursor.execute("INSERT INTO posts (slug, title, tags, content) VALUES (?, ?, ?, ?)", (post.slug, post.metadata.title.lower(), ",".join(post.metadata.tags).lower(), post.content.lower()))
         db.commit()
         self.search_index = db
-        end_time = time.time()
-        print(f"AmiaBlog | Search index built in {(end_time - start_time)*1000:.4f} microseconds")
 
     def list_tags(
         self, order_by: Literal["default", "post_count"] = "default"
@@ -165,15 +186,31 @@ class PostsManager:
     def get_posts(self, selector: Callable[[Post], bool]) -> List[Post]:
         return [post for post in self.posts.values() if selector(post)]
 
-    def search(self, keyword: str, limit: Optional[int] = None) -> List[Post]:
-        results = self.get_posts(
-            lambda post: keyword.lower() in post.metadata.title.lower()
-            or keyword.lower() in [tag.lower() for tag in post.metadata.tags]
-            or keyword.lower() in post.content.lower()
-            and post.metadata.published
-        )
-        if limit is not None:
-            results = results[:limit]
+    def search(self, keyword: str) -> List[Post]:
+        if self.search_index is None:
+            raise ValueError("Search index not built.")
+        print(f"AmiaBlog | Performing '{self.search_method}' search within {len(self.posts)} post(s)")
+        start_time = time.time()
+        if self.search_method == 'fullmatch':
+            cursor = self.search_index.cursor()
+            keyword = keyword.lower()
+            cursor.execute("SELECT slug FROM posts WHERE slug LIKE ? OR title LIKE ? OR tags LIKE ?", (f"%{keyword}%", f"%{keyword}%", f"%{keyword}%"))
+            results = [self.posts[row[0]] for row in cursor.fetchall()]
+        elif self.search_method == 'jieba':
+            keywords = jieba_fast.lcut(keyword.lower())
+            cursor = self.search_index.cursor()
+            hits: Dict[str, int] = {}
+            for kw in keywords:
+                cursor.execute("SELECT slug FROM posts WHERE title LIKE ? OR tags LIKE ? OR content LIKE ?", (f"%{kw}%", f"%{kw}%", f"%{kw}%"))
+                for row in cursor.fetchall():
+                    slug = row[0]
+                    hits[slug] = hits.get(slug, 0) + 1
+            sorted_slugs = sorted(hits.keys(), key=lambda slug: hits[slug], reverse=True)
+            results = [self.posts[slug] for slug in sorted_slugs]
+        else:
+            raise ValueError("Invalid search method.")
+        end_time = time.time()
+        print(f"AmiaBlog | Search completed in {(end_time - start_time)*1000:.4f} milliseconds returning {len(results)} result(s)")
         return results
 
     def get_posts_by_tag(self, tag: str, limit: Optional[int] = None) -> List[Post]:

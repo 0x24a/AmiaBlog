@@ -8,6 +8,7 @@ dependencies = [
     "fastapi>=0.128.0",
     "htmlmin>=0.1.12",
     "httpx>=0.28.1",
+    "jieba-fast>=0.53",
     "jinja2>=3.1.6",
     "pydantic>=2.12.5",
     "pyyaml>=6.0.3",
