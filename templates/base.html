@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="{{ config.site_language }}" class="mdui-theme-{{ config.site_settings.theme }}">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, shrink-to-fit=no"/>
+    <meta name="renderer" content="webkit"/>
+    <meta name="description" content="{% block meta_description %}{{ config.site_settings.description }}{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}{{ config.site_settings.keywords }}{% endblock %}">
+
+    <link rel="stylesheet" href="/static/mdui_2.1.4/mdui.css">
+    <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+
+    @import url('/static/roboto/roboto.css');
+    </style>
+    <script src="/static/mdui_2.1.4/mdui.global.js"></script>
+    <link rel="stylesheet" href="/static/material_icons/material_icons.css">
+
+    {% block head_extra %}{% endblock %}
+
+    <title>{% block title %}{{ config.site_settings.title }}{% endblock %}</title>
+  </head>
+  <body>
+
+      <mdui-top-app-bar>
+        <mdui-button-icon icon="menu"></mdui-button-icon>
+        <a href="/" style="text-decoration: none;"><mdui-top-app-bar-title>{{ config.site_settings.title }}</mdui-top-app-bar-title></a>
+        <div style="flex-grow: 1"></div>
+        <mdui-button-icon icon="more_vert" onclick="mdui.$('#about')[0].open = true"></mdui-button-icon>
+      </mdui-top-app-bar>
+
+      <div style="max-width: 90%; padding-left: 5%;">
+          {% block content %}{% endblock %}
+      </div>
+
+      <mdui-dialog id="about" close-on-esc close-on-overlay-click>
+            <p style="font-size: x-large;">{{ config.site_settings.title }}</p>
+            <p>{{ config.site_settings.description }}</p>
+            <p>{{ i18n.total_posts.format(total_posts) }}</p>
+            <br>
+            <mdui-divider></mdui-divider>
+            <br>
+            <p>{{ i18n.powered_by.format(backend_version) }}</p>
+            <p><a href="https://github.com/0x24a/AmiaBlog" target="_blank">{{ i18n.github_repo }}</a></p>
+            <br>
+      </mdui-dialog>
+
+      {% block extra_scripts %}{% endblock %}
+
+      <script>mdui.setColorScheme('{{ config.site_settings.color_scheme }}')</script>
+  </body>
+</html>
