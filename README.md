@@ -2,11 +2,15 @@
 A simple blog built with FastAPI & MDUIv2.
 
 # Features
-- Markdown&LaTeX support
+- Markdown support ( LaTeX wip )
 - Custom color scheme
 - Light/Dark mode auto switch
 - Responsive design
 - Strong customizability
+- Single-file configuration
+- High-performance search with in-memory sqlite database and jieba-fast tokenizer
+- Cloudflare Analytics support
+- ...And more in the future, try it out!
 
 # Usage
 1. Clone the repository
@@ -25,9 +29,22 @@ uv sync
     "title": "<The name of your site>",
     "description": "<Description of your site>",
     "keywords": "<Keywords separated by commas, used for SEO>",
-    "color_scheme": "<HEX color code, like #DDAACC or #39C5BB>"
+    "color_scheme": "<HEX color code, like #DDAACC or #39C5BB>",
+    "theme": "<auto OR light OR dark, auto as default>",
+    "hljs_languages": [
+      // Languages to be highlighted with hljs, will be automatically downloaded, e.g python, rust, javascript etc.
+      "python",
+      "rust",
+      "javascript"
+    ]
   },
-  "site_language": "<Site default language. Currently only English(en) is supported>",
+  "site_language": "<Site default language. Currently only English(en) and Simpified Chinese(zh-CN) are supported>",
+  "copyright": { // Optional
+    "name": "<Name of the license. e.g CC-BY-SA 4.0>",
+    "refer": "<URL of the license>"
+  },
+  "search_method": "<fullmatch OR jieba, fullmatch as default but jieba is recommended and provides better results>",
+  "cloudflare_analytics_token": "<Cloudflare Analytics Token>",  // Optional
   "disable_template_cache": false // Do not enable this, unless you're debugging/modifying the frontend.
 }
 ```
