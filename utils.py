@@ -142,7 +142,11 @@ class PostsManager:
             if filename.endswith(".md"):
                 with open(os.path.join(self.posts_dir, filename), "r") as f:
                     content = f.read()
-                metadata, content = parse_post(content)
+                try:
+                    metadata, content = parse_post(content)
+                except Exception as e:
+                    print(f"AmiaBlog | Error parsing post {filename}, ignoring: {e}")
+                    continue
                 if not metadata.published:
                     continue
                 slug = ".".join(filename.split(".")[:-1])
