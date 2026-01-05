@@ -135,7 +135,7 @@ class PostsManager:
                     self.tags[tag].count += 1
     
     def _build_search_index(self):
-        print("[AmiaBlog] Building search index...")
+        print(f"AmiaBlog | Building search index for {len(self.posts)} posts...")
         start_time = time.time()
         db = sqlite3.connect(":memory:")
         cursor = db.cursor()
@@ -145,7 +145,7 @@ class PostsManager:
         db.commit()
         self.search_index = db
         end_time = time.time()
-        print(f"[AmiaBlog] Search index built in {(end_time - start_time)*1000:.2f} microseconds")
+        print(f"AmiaBlog | Search index built in {(end_time - start_time)*1000:.4f} microseconds")
 
     def list_tags(
         self, order_by: Literal["default", "post_count"] = "default"
@@ -254,7 +254,7 @@ class HLJSLanguageManager:
                 self.available_languages.append(language)
         if not undownloaded_languages:
             return
-        print(f"[AmiaBlog] Downloading {len(undownloaded_languages)} HLJS languages...")
+        print(f"AmiaBlog | Downloading {len(undownloaded_languages)} HLJS languages...")
         for language in undownloaded_languages:
             try:
                 response = httpx.get(f"{url_prefix}{language}.min.js")
@@ -263,12 +263,12 @@ class HLJSLanguageManager:
                     f.write(response.content)
             except Exception as e:
                 print(
-                    f"[AmiaBlog] Failed to download {language}.min.js: {e}, skipping."
+                    f"AmiaBlog | Failed to download {language}.min.js: {e}, skipping."
                 )
             else:
-                print(f"[AmiaBlog] Successfully downloaded {language}.min.js")
+                print(f"AmiaBlog | Successfully downloaded {language}.min.js")
                 self.available_languages.append(language)
-        print("[AmiaBlog] Download complete!")
+        print("AmiaBlog | Download complete!")
 
     def get_markdown_languages(self, markdown_text: str):
         languages = []
