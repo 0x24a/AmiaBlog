@@ -1,7 +1,7 @@
 [project]
 name = "amiablog"
 version = "0.1.0"
-description = "Add your description here"
+description = "A simple blog system built with FastAPI & MDUIv2."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

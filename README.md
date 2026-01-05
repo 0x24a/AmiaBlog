@@ -1,5 +1,5 @@
 # AmiaBlog
-A simple blog built with FastAPI & MDUIv2.
+A simple blog system built with FastAPI & MDUIv2.
 
 # Features
 - Markdown support ( LaTeX wip )
