@@ -1,7 +1,13 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import HTTPException
-from utils import load_config, TemplateRenderer, PostsManager, I18nProvider, HLJSLanguageManager
+from utils import (
+    load_config,
+    TemplateRenderer,
+    PostsManager,
+    I18nProvider,
+    HLJSLanguageManager,
+)
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -20,8 +26,14 @@ __VERSION__ = "0.1.0"
 @app.get("/")
 async def mainpage():
     return renderer.render(
-        "index.html", config=config, recent_posts=posts_manager.recent_posts(), i18n=i18n, backend_version=__VERSION__, total_posts=len(posts_manager.posts)
+        "index.html",
+        config=config,
+        recent_posts=posts_manager.recent_posts(),
+        i18n=i18n,
+        backend_version=__VERSION__,
+        total_posts=len(posts_manager.posts),
     )
+
 
 @app.get("/post/{slug}")
 async def view_post(slug: str):
@@ -29,9 +41,18 @@ async def view_post(slug: str):
     if post is None:
         return {"error": "Post not found"}
     hljs_languages = hljs_manager.get_markdown_languages(post.content)
-    available_languages = [i for i in hljs_languages if i in hljs_manager.available_languages]
+    available_languages = [
+        i for i in hljs_languages if i in hljs_manager.available_languages
+    ]
     return renderer.render(
-        "post.html", config=config, post=post, i18n=i18n, backend_version=__VERSION__, total_posts=len(posts_manager.posts), hljs_languages=available_languages, copyright=config.copyright
+        "post.html",
+        config=config,
+        post=post,
+        i18n=i18n,
+        backend_version=__VERSION__,
+        total_posts=len(posts_manager.posts),
+        hljs_languages=available_languages,
+        copyright=config.copyright,
     )
 
 
@@ -39,8 +60,16 @@ async def view_post(slug: str):
 async def view_tag(tag: str):
     posts = posts_manager.order_by(posts_manager.get_posts_by_tag(tag), "modified_desc")
     return renderer.render(
-        "tag.html", config=config, posts=posts, i18n=i18n, backend_version=__VERSION__, total_posts=len(posts_manager.posts), tag=tag, copyright=config.copyright
+        "tag.html",
+        config=config,
+        posts=posts,
+        i18n=i18n,
+        backend_version=__VERSION__,
+        total_posts=len(posts_manager.posts),
+        tag=tag,
+        copyright=config.copyright,
     )
+
 
 @app.get("/api/health")
 async def root():

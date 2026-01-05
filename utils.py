@@ -20,9 +20,11 @@ class SiteSettings(BaseModel):
     theme: Literal["auto", "light", "dark"] = "auto"
     hljs_languages: List[str] = []
 
+
 class CopyrightSettings(BaseModel):
     name: str
     refer: str
+
 
 class Config(BaseModel):
     site_settings: SiteSettings
@@ -60,8 +62,10 @@ class TemplateRenderer:
     ) -> None:
         self.template_dir = template_dir
         self.disable_cache = disable_cache
-        self.env = Environment(loader=FileSystemLoader(template_dir), autoescape=select_autoescape())
-        self.env.filters['urlencode'] = lambda s: quote(s, safe='')
+        self.env = Environment(
+            loader=FileSystemLoader(template_dir), autoescape=select_autoescape()
+        )
+        self.env.filters["urlencode"] = lambda s: quote(s, safe="")
         self.templates = {}
 
     def render(self, template_name: str, **context) -> HTMLResponse:
@@ -112,23 +116,23 @@ class PostsManager:
 
     def recent_posts(self, n: int = 5) -> List[Post]:
         return self.order_by(
-            self.get_posts(
-                lambda post: post.metadata.published
-            ),
-            "modified_desc"
+            self.get_posts(lambda post: post.metadata.published), "modified_desc"
         )[:n]
-    
+
     def get_posts(self, selector: Callable[[Post], bool]) -> List[Post]:
         return [post for post in self.posts.values() if selector(post)]
-    
+
     def search(self, keyword: str, limit: Optional[int] = None) -> List[Post]:
         results = self.get_posts(
-            lambda post: keyword.lower() in post.metadata.title.lower() or keyword.lower() in [tag.lower() for tag in post.metadata.tags] or keyword.lower() in post.content.lower() and post.metadata.published
+            lambda post: keyword.lower() in post.metadata.title.lower()
+            or keyword.lower() in [tag.lower() for tag in post.metadata.tags]
+            or keyword.lower() in post.content.lower()
+            and post.metadata.published
         )
         if limit is not None:
             results = results[:limit]
         return results
-    
+
     def get_posts_by_tag(self, tag: str, limit: Optional[int] = None) -> List[Post]:
         results = self.get_posts(
             lambda post: tag.lower() in [tag.lower() for tag in post.metadata.tags]
@@ -136,8 +140,12 @@ class PostsManager:
         if limit is not None:
             results = results[:limit]
         return results
-    
-    def order_by(self, posts: List[Post], key: Literal["date", "date_desc", "modified", "modified_desc"]):
+
+    def order_by(
+        self,
+        posts: List[Post],
+        key: Literal["date", "date_desc", "modified", "modified_desc"],
+    ):
         if key == "date":
             return sorted(posts, key=lambda x: x.metadata.date)
         elif key == "date_desc":
@@ -149,22 +157,24 @@ class PostsManager:
         else:
             raise ValueError(f"Invalid key: {key}")
 
+
 class I18nTerm:
     def __init__(self, key: str, term: Optional[str]):
         self.key = key
         self.term = term
-    
+
     def __str__(self):
         return self.term if self.term is not None else f"<untranslated {self.key}>"
-    
+
     def __repr__(self):
         return f"I18nTerm({self.key}, {self.term})"
-    
+
     def format(self, *args, **kwargs):
         if self.term is None:
             return f"<untranslated {self.key}>"
         # Use Markup.format which automatically escapes arguments
         return Markup(self.term).format(*args, **kwargs)
+
 
 class I18nProvider:
     def __init__(self, language: str = "en") -> None:
@@ -176,17 +186,22 @@ class I18nProvider:
         with open(f"languages/{self.language}.json", "r") as f:
             terms = json.load(f)
         self.translations = {key: I18nTerm(key, term) for key, term in terms.items()}
-    
+
     def __getattr__(self, key: str) -> I18nTerm:
         return self.translations.get(key, I18nTerm(key, None))
+
 
 class HLJSLanguageManager:
     def __init__(self, languages: List[str]):
         self.languages = languages
         self.available_languages = []
         self.download()
-    
-    def download(self, prefix: str = "static/hljs_11.1.1", url_prefix: str = "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/languages/"):
+
+    def download(
+        self,
+        prefix: str = "static/hljs_11.1.1",
+        url_prefix: str = "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/languages/",
+    ):
         undownloaded_languages = []
         files = os.listdir(prefix)
         for language in self.languages:
@@ -204,16 +219,18 @@ class HLJSLanguageManager:
                 with open(os.path.join(prefix, f"{language}.min.js"), "wb") as f:
                     f.write(response.content)
             except Exception as e:
-                print(f"[AmiaBlog] Failed to download {language}.min.js: {e}, skipping.")
+                print(
+                    f"[AmiaBlog] Failed to download {language}.min.js: {e}, skipping."
+                )
             else:
                 print(f"[AmiaBlog] Successfully downloaded {language}.min.js")
                 self.available_languages.append(language)
         print("[AmiaBlog] Download complete!")
-    
+
     def get_markdown_languages(self, markdown_text: str):
         languages = []
         lines = markdown_text.splitlines()
-        
+
         for line in lines:
             clean_line = line.lstrip()
             if clean_line.startswith("```"):
@@ -221,5 +238,5 @@ class HLJSLanguageManager:
                 if language_tag:
                     lang = language_tag.split()[0]
                     languages.append(lang)
-                    
+
         return languages
