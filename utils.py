@@ -51,6 +51,11 @@ class Post(BaseModel):
     slug: str
 
 
+class Tag(BaseModel):
+    name: str
+    count: int
+
+
 def load_config(filename: str = "config.json") -> Config:
     with open(filename, "r") as f:
         return Config.model_validate_json(f.read())
@@ -104,6 +109,7 @@ class PostsManager:
     def __init__(self, posts_dir: str = "posts") -> None:
         self.posts_dir = posts_dir
         self.posts: Dict[str, Post] = {}
+        self.tags: Dict[str, Tag] = {}
 
     def load_posts(self) -> None:
         for filename in os.listdir(self.posts_dir):
@@ -113,6 +119,25 @@ class PostsManager:
                 metadata, content = parse_post(content)
                 slug = ".".join(filename.split(".")[:-1])
                 self.posts[slug] = Post(metadata=metadata, content=content, slug=slug)
+        self._build_tag_index()
+
+    def _build_tag_index(self):
+        for post in self.posts.values():
+            for tag in post.metadata.tags:
+                if tag not in self.tags:
+                    self.tags[tag] = Tag(name=tag, count=1)
+                else:
+                    self.tags[tag].count += 1
+
+    def list_tags(
+        self, order_by: Literal["default", "post_count"] = "default"
+    ) -> List[Tag]:
+        if order_by == "default":
+            return list(self.tags.values())
+        elif order_by == "post_count":
+            return sorted(
+                list(self.tags.values()), key=lambda tag: tag.count, reverse=True
+            )
 
     def recent_posts(self, n: int = 5) -> List[Post]:
         return self.order_by(

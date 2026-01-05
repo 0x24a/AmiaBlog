@@ -71,6 +71,21 @@ async def view_tag(tag: str):
     )
 
 
+@app.get("/tags")
+async def view_tags():
+    tags = posts_manager.list_tags(order_by="post_count")
+    return renderer.render(
+        "tags.html",
+        config=config,
+        tags=tags,
+        n_tags=len(tags),
+        i18n=i18n,
+        backend_version=__VERSION__,
+        total_posts=len(posts_manager.posts),
+        copyright=config.copyright,
+    )
+
+
 @app.get("/api/health")
 async def root():
     return {"status": "ok", "server": "AmiaBlog", "version": __VERSION__}

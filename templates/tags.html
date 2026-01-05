@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}{{ i18n.tags_view }} - {{ config.site_settings.title }}{% endblock %}
+
+{% block content %}
+    <p style="font-size: x-large;">{{ i18n.tags_view }}</p>
+    <p>{{ i18n.tags_view_desc }}<br>{{ i18n.tags_view_count.format(n_tags) }}</p>
+    <br>
+    <mdui-divider></mdui-divider>
+    <br>
+    {% for tag in tags %}
+        <mdui-tooltip placement="bottom" content="{{ i18n.tag_post_count.format(tag.count) }}">
+            <mdui-chip href="/tag/{{ tag.name | urlencode }}">{{ tag.name }}</mdui-chip>
+        </mdui-tooltip>
+        &nbsp;
+    {% endfor %}
+    {% if not tags %}
+        <p>{{ i18n.no_tags }}</p>
+    {% endif %}
+{% endblock %}
