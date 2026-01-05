@@ -6,6 +6,7 @@ from markupsafe import Markup
 import datetime
 import yaml
 import os
+import htmlmin
 import httpx
 import json
 from urllib.parse import quote
@@ -66,7 +67,8 @@ class TemplateRenderer:
     def render(self, template_name: str, **context) -> HTMLResponse:
         if self.disable_cache or template_name not in self.templates:
             self.templates[template_name] = self.env.get_template(template_name)
-        return HTMLResponse(self.templates[template_name].render(**context))
+        rendered_html = self.templates[template_name].render(**context)
+        return HTMLResponse(htmlmin.minify(rendered_html))
 
 
 def parse_post(content: str) -> Tuple[PostMetadata, str]:
