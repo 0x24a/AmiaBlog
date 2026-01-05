@@ -8,6 +8,8 @@ import yaml
 import os
 import htmlmin
 import httpx
+import sqlite3
+import time
 import json
 from urllib.parse import quote
 
@@ -111,6 +113,7 @@ class PostsManager:
         self.posts_dir = posts_dir
         self.posts: Dict[str, Post] = {}
         self.tags: Dict[str, Tag] = {}
+        self.search_index: Optional[sqlite3.Connection] = None
 
     def load_posts(self) -> None:
         for filename in os.listdir(self.posts_dir):
@@ -121,6 +124,7 @@ class PostsManager:
                 slug = ".".join(filename.split(".")[:-1])
                 self.posts[slug] = Post(metadata=metadata, content=content, slug=slug)
         self._build_tag_index()
+        self._build_search_index()
 
     def _build_tag_index(self):
         for post in self.posts.values():
@@ -129,6 +133,19 @@ class PostsManager:
                     self.tags[tag] = Tag(name=tag, count=1)
                 else:
                     self.tags[tag].count += 1
+    
+    def _build_search_index(self):
+        print("[AmiaBlog] Building search index...")
+        start_time = time.time()
+        db = sqlite3.connect(":memory:")
+        cursor = db.cursor()
+        cursor.execute("CREATE TABLE posts (id INTEGER PRIMARY KEY, slug TEXT, content TEXT)")
+        for post in self.posts.values():
+            cursor.execute("INSERT INTO posts (slug, content) VALUES (?, ?)", (post.slug, post.content))
+        db.commit()
+        self.search_index = db
+        end_time = time.time()
+        print(f"[AmiaBlog] Search index built in {(end_time - start_time)*1000:.2f} microseconds")
 
     def list_tags(
         self, order_by: Literal["default", "post_count"] = "default"
