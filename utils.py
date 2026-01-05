@@ -130,6 +130,12 @@ class PostsManager:
         self.load_posts()
 
     def load_posts(self) -> None:
+        # Clear posts & db
+        self.posts.clear()
+        self.tags.clear()
+        if self.search_index:
+            self.search_index.close()
+            self.search_index = None
         print("AmiaBlog | Loading posts")
         start_time = time.time()
         for filename in os.listdir(self.posts_dir):
@@ -137,6 +143,8 @@ class PostsManager:
                 with open(os.path.join(self.posts_dir, filename), "r") as f:
                     content = f.read()
                 metadata, content = parse_post(content)
+                if not metadata.published:
+                    continue
                 slug = ".".join(filename.split(".")[:-1])
                 self.posts[slug] = Post(metadata=metadata, content=content, slug=slug)
         end_time = time.time()
@@ -182,7 +190,7 @@ class PostsManager:
 
     def recent_posts(self, n: int = 5) -> List[Post]:
         return self.order_by(
-            self.get_posts(lambda post: post.metadata.published), "modified_desc"
+            list(self.posts.values()), "modified_desc"
         )[:n]
 
     def get_posts(self, selector: Callable[[Post], bool]) -> List[Post]:
