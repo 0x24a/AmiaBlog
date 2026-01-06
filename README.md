@@ -12,6 +12,8 @@
 </p>
   
 
+
+
 AmiaBlog is a simple blog system that emphasizes simplicity, customization, and speed. It uses Markdown for content, In-memory SQLite for search, and provides i18n support out of the box.
 
 ## Table of Contents
