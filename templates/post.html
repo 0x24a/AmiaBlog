@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block meta_description %}{{ post.metadata.description }}{% endblock %}
-{% block meta_keywords %}{{ config.site_settings.keywords }}, {{ ', '.join(post.metadata.tags) }}{% endblock %}
+{% block meta_keywords %}{{ config.site_settings.keywords }}, {{ ', '.join(post.metadata.tags) }}{% if post.metadata.keywords %}, {{ ', '.join(post.metadata.keywords) }}{% endif %}{% endblock %}
 
 {% block head_extra %}
     <script src="/static/markdown-it-14.1.0.min.js"></script>

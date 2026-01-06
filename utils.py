@@ -49,6 +49,7 @@ class PostMetadata(BaseModel):
     description: str
     published: bool
     author: str
+    keywords: list[str] = []
 
 
 class Post(BaseModel):
@@ -176,9 +177,9 @@ class PostsManager:
     def _build_search_index(self):
         db = sqlite3.connect(":memory:")
         cursor = db.cursor()
-        cursor.execute("CREATE TABLE posts (id INTEGER PRIMARY KEY, slug TEXT, title TEXT, tags TEXT, content TEXT)")
+        cursor.execute("CREATE TABLE posts (id INTEGER PRIMARY KEY, slug TEXT, title TEXT, tags TEXT, content TEXT, keywords TEXT)")
         for post in self.posts.values():
-            cursor.execute("INSERT INTO posts (slug, title, tags, content) VALUES (?, ?, ?, ?)", (post.slug, post.metadata.title.lower(), ",".join(post.metadata.tags).lower(), post.content.lower()))
+            cursor.execute("INSERT INTO posts (slug, title, tags, content, keywords) VALUES (?, ?, ?, ?, ?)", (post.slug, post.metadata.title.lower(), ",".join(post.metadata.tags).lower(), post.content.lower(), ",".join(post.metadata.keywords).lower()))
         db.commit()
         self.search_index = db
 
@@ -208,14 +209,14 @@ class PostsManager:
         if self.search_method == 'fullmatch':
             cursor = self.search_index.cursor()
             keyword = keyword.lower()
-            cursor.execute("SELECT slug FROM posts WHERE slug LIKE ? OR title LIKE ? OR tags LIKE ?", (f"%{keyword}%", f"%{keyword}%", f"%{keyword}%"))
+            cursor.execute("SELECT slug FROM posts WHERE slug LIKE ? OR title LIKE ? OR tags LIKE ? OR keywords LIKE ?", (f"%{keyword}%", f"%{keyword}%", f"%{keyword}%", f"%{keyword}%"))
             results = [self.posts[row[0]] for row in cursor.fetchall()]
         elif self.search_method == 'jieba':
             keywords = jieba_fast.lcut(keyword.lower())
             cursor = self.search_index.cursor()
             hits: Dict[str, int] = {}
             for kw in keywords:
-                cursor.execute("SELECT slug FROM posts WHERE title LIKE ? OR tags LIKE ? OR content LIKE ?", (f"%{kw}%", f"%{kw}%", f"%{kw}%"))
+                cursor.execute("SELECT slug FROM posts WHERE title LIKE ? OR tags LIKE ? OR content LIKE ? OR keywords LIKE ?", (f"%{kw}%", f"%{kw}%", f"%{kw}%", f"%{kw}%"))
                 for row in cursor.fetchall():
                     slug = row[0]
                     hits[slug] = hits.get(slug, 0) + 1
