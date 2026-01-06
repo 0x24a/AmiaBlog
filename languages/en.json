@@ -35,5 +35,7 @@
   "error_desc": "Error Details: {}",
   "error_redirect": "Redirecting you to the last page after 5 seconds...",
   "error_relevance_in_fullmatch": "Relevance search is not available because the server is using 'fullmatch' matching method. Ask the site owner to switch to 'jieba' matching method.",
-  "error_invalid_query": "Query must be between 1 and 50 characters."
+  "error_invalid_query": "Query must be between 1 and 50 characters.",
+  "error_post_not_found": "Post not found. There might be a typo in the URL or the post has been deleted.",
+  "error_tag_not_found": "Tag not found. There might be a typo in the URL or the tag has been deleted."
 }

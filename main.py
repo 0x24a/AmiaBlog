@@ -40,7 +40,11 @@ async def mainpage():
 async def view_post(slug: str):
     post = posts_manager.posts.get(slug)
     if post is None:
-        return {"error": "Post not found"}
+        return renderer.render(
+            "error.html",
+            status_code=404,
+            error=i18n.error_post_not_found
+        )
     hljs_languages = hljs_manager.get_markdown_languages(post.content)
     available_languages = [
         i for i in hljs_languages if i in hljs_manager.available_languages
@@ -65,6 +69,12 @@ async def view_posts(order: Optional[Literal['date', 'date_desc', 'modified', 'm
 @app.get("/tag/{tag:str}")
 async def view_tag(tag: str):
     posts = posts_manager.order_by(posts_manager.get_posts_by_tag(tag), "modified_desc")
+    if len(posts) == 0:
+        return renderer.render(
+            "error.html",
+            status_code=404,
+            error=i18n.error_tag_not_found
+        )
     return renderer.render(
         "tag.html",
         posts=posts,
