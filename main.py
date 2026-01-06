@@ -1,17 +1,19 @@
 from typing import Literal, Optional
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from utils import (
     load_config,
+    get_amiablog_version,
     TemplateRenderer,
     PostsManager,
     I18nProvider,
     HLJSLanguageManager,
+    RSSProvider
 )
 import time
 
-__VERSION__ = "0.1.0"
+__VERSION__ = get_amiablog_version()
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -27,6 +29,7 @@ renderer = TemplateRenderer(disable_cache=config.disable_template_cache, static_
     "total_posts": len(posts_manager.posts),
     "copyright": config.copyright,
 })
+rss_provider = RSSProvider(config, posts_manager)
 
 @app.get("/favicon.ico")
 async def favicon():
@@ -37,6 +40,13 @@ async def mainpage():
     return renderer.render(
         "index.html",
         recent_posts=posts_manager.recent_posts()
+    )
+
+@app.get("/feed")
+async def rss():
+    return Response(
+        rss_provider.generate_rss(),
+        media_type="application/rss+xml; charset=utf-8",
     )
 
 

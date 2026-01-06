@@ -3,6 +3,7 @@
     "title": "AmiaBlog",
     "description": "A simple blog made with FastAPI & MDUIv2",
     "keywords": "amiablog, blog, fastapi, jinja2",
+    "site_url": null,
     "color_scheme": "DDAACC",
     "hljs_languages": [
       "python",
