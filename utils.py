@@ -110,7 +110,10 @@ def parse_post(content: str) -> Tuple[PostMetadata, str]:
             metadata_lines.append(line)
         else:
             content_lines.append(line)
-    metadata = PostMetadata.model_validate(yaml.safe_load("\n".join(metadata_lines)))
+    metadata = yaml.safe_load("\n".join(metadata_lines))
+    if isinstance(metadata.get("tags"), list):
+        metadata["tags"] = [str(tag) for tag in metadata["tags"]]
+    metadata = PostMetadata.model_validate(metadata)
     return metadata, "\n".join(content_lines)
 
 
