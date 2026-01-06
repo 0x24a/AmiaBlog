@@ -51,6 +51,16 @@ async def view_post(slug: str):
         hljs_languages=available_languages
     )
 
+@app.get("/posts")
+async def view_posts(order: Optional[Literal['date', 'date_desc', 'modified', 'modified_desc']] = None):
+    if not order:
+        order = "modified_desc"
+    posts = posts_manager.order_by(list(posts_manager.posts.values()), order)
+    return renderer.render(
+        "posts.html",
+        posts=posts,
+        order=order
+    )
 
 @app.get("/tag/{tag:str}")
 async def view_tag(tag: str):

@@ -2,6 +2,8 @@
   "recent_posts": "Recent Posts",
   "no_recent_posts": "No recent posts.",
   "total_posts": "This blog has {} post(s).",
+  "no_posts": "No posts have been published, yet.",
+  "all_posts": "All Posts",
   "powered_by": "Powered by AmiaBlog V{}",
   "powered_by_desc": "A simple blog system built with FastAPI & MDUIv2.",
   "github_repo": "Github repository",

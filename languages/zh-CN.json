@@ -2,6 +2,8 @@
   "recent_posts": "最近文章",
   "no_recent_posts": "没有最近的文章。",
   "total_posts": "共有 {} 篇文章发布于该博客。",
+  "no_posts": "目前没有任何已发布的文章。",
+  "all_posts": "所有文章",
   "powered_by": "基于 AmiaBlog V{}",
   "powered_by_desc": "一个使用 FastAPI & MDUIv2 构建的简约博客系统。",
   "github_repo": "Github 仓库",
