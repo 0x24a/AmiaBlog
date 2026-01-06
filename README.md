@@ -20,10 +20,7 @@ AmiaBlog is a simple blog system that emphasizes simplicity, customization, and 
 
 - [Features](#features)
 - [Quick Start](#quick-start)
-- [Configuration](#configuration)
-- [Writing Posts](#writing-posts)
 - [Deployment](#deployment)
-- [API Reference](#api-reference)
 - [Contributing](#contributing)
 - [License](#license)
 
