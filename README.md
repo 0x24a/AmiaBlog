@@ -1,14 +1,16 @@
 <p align="center">
   <img src="https://github.com/0x24a/AmiaBlog/blob/main/docs/mizukichibi.png?raw=true" alt="Mizuki Chibi" height="200" width="100"/>
-  <h1>AmiaBlog</h1>
-  A simple, lightweight blog system built with FastAPI & MDUIv2.
-  
-![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.128+-009688.svg?logo=fastapi)
-![UV](https://img.shields.io/badge/UV-package%20manager-FFD343.svg?logo=python)
-  
 </p>
+<h1 align="center">AmiaBlog</h1>
+<p align="center">A simple, lightweight blog system built with FastAPI & MDUIv2.</p>
+<p align="center">
+<img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python Version">
+<img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
+<img src="https://img.shields.io/badge/FastAPI-0.128+-009688.svg?logo=fastapi" alt="FastAPI">
+<img src="https://img.shields.io/badge/MDUI-2.1.4-009688.svg?logo=material-design-icons" alt="MDUIv2">
+<img src="https://img.shields.io/badge/UV-package%20manager-FFD343.svg?logo=python" alt="UV">
+</p>
+  
 
 AmiaBlog is a simple blog system that emphasizes simplicity, customization, and speed. It uses Markdown for content, In-memory SQLite for search, and provides i18n support out of the box.
 
