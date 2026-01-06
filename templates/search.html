@@ -10,7 +10,9 @@
         <br>
         <br>
         <mdui-select value="{{ order }}" helper="{{ i18n.search_order }}" name="order">
+          {% if config.search_method == "jieba" %}
           <mdui-menu-item value="relevance">{{ i18n.search_relevance }}</mdui-menu-item>
+          {% endif %}
           <mdui-menu-item value="date">{{ i18n.search_date }}</mdui-menu-item>
           <mdui-menu-item value="date_desc">{{ i18n.search_date_desc }}</mdui-menu-item>
           <mdui-menu-item value="modified">{{ i18n.search_modified }}</mdui-menu-item>
