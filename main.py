@@ -1,6 +1,7 @@
 from typing import Literal, Optional
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from utils import (
     load_config,
     TemplateRenderer,
@@ -27,6 +28,9 @@ renderer = TemplateRenderer(disable_cache=config.disable_template_cache, static_
     "copyright": config.copyright,
 })
 
+@app.get("/favicon.ico")
+async def favicon():
+    return FileResponse("static/favicon.ico")
 
 @app.get("/")
 async def mainpage():
