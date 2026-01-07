@@ -15,6 +15,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markupsafe import Markup, escape
 from pydantic import BaseModel
 from loguru import logger
+import platform
 
 
 class SiteSettings(BaseModel):
@@ -90,15 +91,28 @@ class TemplateRenderer:
         self.env.filters["urlencode"] = lambda s: quote(s, safe="")
         self.templates = {}
         self.static_params = static_params
+    
+    def render_to_plain_text(
+        self, template_name: str, **context
+    ) -> str:
+        if self.disable_cache or template_name not in self.templates:
+            self.templates[template_name] = self.env.get_template(template_name)
+        context.update(self.static_params)
+        rendered_text = self.templates[template_name].render(**context)
+        return htmlmin.minify(rendered_text)
 
     def render(
         self, template_name: str, status_code: int = 200, **context
     ) -> HTMLResponse:
-        if self.disable_cache or template_name not in self.templates:
-            self.templates[template_name] = self.env.get_template(template_name)
-        context.update(self.static_params)
-        rendered_html = self.templates[template_name].render(**context)
-        return HTMLResponse(htmlmin.minify(rendered_html), status_code=status_code)
+        rendered_html = self.render_to_plain_text(template_name, **context)
+        return HTMLResponse(rendered_html, status_code=status_code)
+    
+    def render_static(
+        self, destination: str, template_name: str, **context
+    ) -> str:
+        with open(destination, "w+") as f:
+            f.write(self.render_to_plain_text(template_name, **context))
+        return destination
 
 
 def parse_post(content: str) -> Tuple[PostMetadata, str]:
@@ -136,12 +150,32 @@ def get_amiablog_version():
             if line.startswith("version"):
                 return line.split("=")[1].strip().strip('"')
 
+def get_platform_string():
+    os_name = platform.system().lower()
+    os_map = {
+        "darwin": "macos",
+        "linux": "linux",
+        "windows": "windows"
+    }
+    final_os = os_map.get(os_name, os_name)
+
+    arch = platform.machine().lower()
+    arch_map = {
+        "arm64": "aarch64",
+        "amd64": "x86_64",
+        "x86_64": "x86_64",
+        "aarch64": "aarch64"
+    }
+    final_arch = arch_map.get(arch, arch)
+
+    return f"{final_os}-{final_arch}-none"
 
 class PostsManager:
     def __init__(
         self,
         posts_dir: str = "posts",
         search_method: Literal["fullmatch", "jieba"] = "fullmatch",
+        build_search_index: bool = True
     ) -> None:
         self.posts_dir = posts_dir
         self.posts: Dict[str, Post] = {}
@@ -155,9 +189,9 @@ class PostsManager:
             pass
         else:
             raise ValueError("Invalid search method.")
-        self.load_posts()
+        self.load_posts(build_search_index)
 
-    def load_posts(self) -> None:
+    def load_posts(self, build_search_index: bool = True) -> None:
         # Clear posts & db
         self.posts.clear()
         self.tags.clear()
@@ -188,11 +222,12 @@ class PostsManager:
         self._build_tag_index()
         end_time = time.time()
         logger.info(f"Built tag index in {(end_time - start_time)*1000000:.4f}us")
-        logger.info("Building search index")
-        start_time = time.time()
-        self._build_search_index()
-        end_time = time.time()
-        logger.info(f"Built search index in {(end_time - start_time)*1000:.4f}ms")
+        if build_search_index:
+            logger.info("Building search index")
+            start_time = time.time()
+            self._build_search_index()
+            end_time = time.time()
+            logger.info(f"Built search index in {(end_time - start_time)*1000:.4f}ms")
         logger.info("Finished loading posts")
 
     def _build_tag_index(self):
@@ -394,7 +429,7 @@ class RSSProvider:
         dt_datetime = datetime.datetime(dt.year, dt.month, dt.day, 12, 0, 0)
         return dt_datetime.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
-    def generate_rss(self, limit: Optional[int] = None) -> str:
+    def generate_rss(self, limit: Optional[int] = None, is_static: bool = False) -> str:
         site_settings = self.config.site_settings
         if site_settings.site_url is None:
             site_url = "https://example.com"
@@ -445,6 +480,8 @@ class RSSProvider:
         # Add items for each post
         for post in posts:
             post_url = f"{site_url}/post/{post.slug}"
+            if is_static:
+                post_url += ".html"
             title = escape(post.metadata.title)
             description = escape(post.metadata.description)
             pub_date = self._format_rfc822_date(post.metadata.date)

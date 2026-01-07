@@ -17,3 +17,6 @@ posts/*.md
 static/hljs_11.1.1/*
 !static/hljs_11.1.1/amiablog.min.css
 !static/hljs_11.1.1/highlight.min.js
+
+# Generated static site
+dist/

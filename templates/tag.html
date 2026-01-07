@@ -5,12 +5,12 @@
 {% block content %}
     <p style="font-size: x-large;">{{ i18n.tag_search.format(tag) }}</p>
     {% for post in posts %}
-    <mdui-card href="/post/{{ post.slug }}" target="_blank" variant="elevated" style="width: 100%; background-color: rgb(var(--mdui-color-surface-container));">
+    <mdui-card href="/post/{{ post.slug }}{% if is_static %}.html{% endif %}" target="_blank" variant="elevated" style="width: 100%; background-color: rgb(var(--mdui-color-surface-container));">
         <div style="padding-left: 16px; padding-right: 16px;">
           <p style="font-size: large; font-weight: bold;">{{ post.metadata.title }}</p>
           <p>{{ post.metadata.description }}</p>
           {% for tag in post.metadata.tags %}
-          <mdui-chip href="/tag/{{ tag | urlencode }}" target="_blank">{{ tag }}</mdui-chip>&nbsp;
+          <mdui-chip href="/tag/{{ tag | urlencode }}{% if is_static %}.html{% endif %}" target="_blank">{{ tag }}</mdui-chip>&nbsp;
           {% endfor %}
           <p style="display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; color: rgb(var(--mdui-color-outline))">
             <span style="display: inline-flex; align-items: center; gap: 0.25rem;">

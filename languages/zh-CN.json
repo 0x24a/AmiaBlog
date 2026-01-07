@@ -30,6 +30,7 @@
   "enter_keyword_here": "在此键入关键词",
   "enter_keyword_to_start": "键入关键词以开始检索。",
   "search_found_result": "找到 {n_posts} 篇相关文章。（{search_time} 毫秒）",
+  "static_build_time": "此静态站点于 {}（服务器本地时间）构建。",
   "error_title": "出现错误",
   "error_occured": "AmiaBlog 在处理该请求时出现了问题。",
   "error_desc": "详细信息: {}",
@@ -37,5 +38,6 @@
   "error_relevance_in_fullmatch": "当前服务端搜索模式不支持按相关性排序，请联系管理员切换到 'jieba' 搜索模式。",
   "error_invalid_query": "搜索关键词应在 1 到 50 个字符之间。",
   "error_post_not_found": "未找到文章。可能是因为 URL 键入错误或文章已被移除。",
-  "error_tag_not_found": "未找到标签。可能是因为 URL 键入错误或标签已被移除。"
+  "error_tag_not_found": "未找到标签。可能是因为 URL 键入错误或标签已被移除。",
+  "error_page_not_found": "未找到页面。可能是因为 URL 键入错误或页面已被移除。"
 }

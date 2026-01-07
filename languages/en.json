@@ -30,6 +30,7 @@
   "enter_keyword_here": "Enter keyword here",
   "enter_keyword_to_start": "Enter keyword to start searching.",
   "search_found_result": "Found {n_posts} posts in {search_time} milliseconds.",
+  "static_build_time": "This static site was built at {}(server local time).",
   "error_title": "Error",
   "error_occured": "AmiaBlog encountered an error.",
   "error_desc": "Error Details: {}",
@@ -37,5 +38,6 @@
   "error_relevance_in_fullmatch": "Relevance search is not available because the server is using 'fullmatch' matching method. Ask the site owner to switch to 'jieba' matching method.",
   "error_invalid_query": "Query must be between 1 and 50 characters.",
   "error_post_not_found": "Post not found. There might be a typo in the URL or the post has been deleted.",
-  "error_tag_not_found": "Tag not found. There might be a typo in the URL or the tag has been deleted."
+  "error_tag_not_found": "Tag not found. There might be a typo in the URL or the tag has been deleted.",
+  "error_page_not_found": "Page not found. There might be a typo in the URL or the page has been deleted."
 }
