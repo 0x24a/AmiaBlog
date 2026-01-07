@@ -97,7 +97,7 @@ class AmiaBlogStaticGenerator:
         self.renderer.render_static(
             os.path.join(self.destination, "404.html"),
             "error.html",
-            error=self.i18n.page_not_found,
+            error=self.i18n.error_page_not_found,
         )
 
     def render_posts(self):
