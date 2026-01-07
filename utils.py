@@ -91,10 +91,8 @@ class TemplateRenderer:
         self.env.filters["urlencode"] = lambda s: quote(s, safe="")
         self.templates = {}
         self.static_params = static_params
-    
-    def render_to_plain_text(
-        self, template_name: str, **context
-    ) -> str:
+
+    def render_to_plain_text(self, template_name: str, **context) -> str:
         if self.disable_cache or template_name not in self.templates:
             self.templates[template_name] = self.env.get_template(template_name)
         context.update(self.static_params)
@@ -106,10 +104,8 @@ class TemplateRenderer:
     ) -> HTMLResponse:
         rendered_html = self.render_to_plain_text(template_name, **context)
         return HTMLResponse(rendered_html, status_code=status_code)
-    
-    def render_static(
-        self, destination: str, template_name: str, **context
-    ) -> str:
+
+    def render_static(self, destination: str, template_name: str, **context) -> str:
         with open(destination, "w+") as f:
             f.write(self.render_to_plain_text(template_name, **context))
         return destination
@@ -150,13 +146,10 @@ def get_amiablog_version():
             if line.startswith("version"):
                 return line.split("=")[1].strip().strip('"')
 
+
 def get_platform_string():
     os_name = platform.system().lower()
-    os_map = {
-        "darwin": "macos",
-        "linux": "linux",
-        "windows": "windows"
-    }
+    os_map = {"darwin": "macos", "linux": "linux", "windows": "windows"}
     final_os = os_map.get(os_name, os_name)
 
     arch = platform.machine().lower()
@@ -164,18 +157,19 @@ def get_platform_string():
         "arm64": "aarch64",
         "amd64": "x86_64",
         "x86_64": "x86_64",
-        "aarch64": "aarch64"
+        "aarch64": "aarch64",
     }
     final_arch = arch_map.get(arch, arch)
 
     return f"{final_os}-{final_arch}-none"
+
 
 class PostsManager:
     def __init__(
         self,
         posts_dir: str = "posts",
         search_method: Literal["fullmatch", "jieba"] = "fullmatch",
-        build_search_index: bool = True
+        build_search_index: bool = True,
     ) -> None:
         self.posts_dir = posts_dir
         self.posts: Dict[str, Post] = {}
