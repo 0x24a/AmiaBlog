@@ -145,7 +145,7 @@ class AmiaBlogStaticGenerator:
     def write_build_info(self, build_time, build_time_usage):
         with open(os.path.join(self.destination, "amiablog_build_info.txt"), "w+") as f:
             f.write(
-                f"software: AmiaBlog\npython_version: {sys.version}\nplatform: {get_platform_string()}\nbuild_time: {build_time}\nbuild_time_usage: {round(build_time_usage,2)}ms\n"
+                f"software: AmiaBlog\nversion: {__VERSION__}\npython_version: {sys.version}\nplatform: {get_platform_string()}\nbuild_time: {build_time}\nbuild_time_usage: {round(build_time_usage,2)}ms\n"
             )
 
     def render(self):
