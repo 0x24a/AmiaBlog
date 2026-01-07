@@ -14,6 +14,7 @@ from fastapi.responses import HTMLResponse
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markupsafe import Markup, escape
 from pydantic import BaseModel
+from loguru import logger
 
 
 class SiteSettings(BaseModel):
@@ -68,13 +69,18 @@ def load_config(filename: str = "config.json") -> Config:
     with open(filename, "r") as f:
         config = Config.model_validate_json(f.read())
     if config.site_settings.site_url is None:
-        print("AmiaBlog | Warning: config.site_settings.site_url is not set. RSS feed might break. Using https://example.com/")
+        logger.warning(
+            "config.site_settings.site_url is not set. RSS feed might break. Using https://example.com/"
+        )
     return config
 
 
 class TemplateRenderer:
     def __init__(
-        self, template_dir: str = "templates", disable_cache: bool = False, static_params: Dict[str, Any] = {}
+        self,
+        template_dir: str = "templates",
+        disable_cache: bool = False,
+        static_params: Dict[str, Any] = {},
     ) -> None:
         self.template_dir = template_dir
         self.disable_cache = disable_cache
@@ -85,7 +91,9 @@ class TemplateRenderer:
         self.templates = {}
         self.static_params = static_params
 
-    def render(self, template_name: str, status_code: int = 200, **context) -> HTMLResponse:
+    def render(
+        self, template_name: str, status_code: int = 200, **context
+    ) -> HTMLResponse:
         if self.disable_cache or template_name not in self.templates:
             self.templates[template_name] = self.env.get_template(template_name)
         context.update(self.static_params)
@@ -120,6 +128,7 @@ def parse_post(content: str) -> Tuple[PostMetadata, str]:
     metadata = PostMetadata.model_validate(metadata)
     return metadata, "\n".join(content_lines)
 
+
 def get_amiablog_version():
     with open("pyproject.toml", "r") as f:
         content = f.read()
@@ -127,17 +136,22 @@ def get_amiablog_version():
             if line.startswith("version"):
                 return line.split("=")[1].strip().strip('"')
 
+
 class PostsManager:
-    def __init__(self, posts_dir: str = "posts", search_method: Literal['fullmatch', 'jieba'] = 'fullmatch') -> None:
+    def __init__(
+        self,
+        posts_dir: str = "posts",
+        search_method: Literal["fullmatch", "jieba"] = "fullmatch",
+    ) -> None:
         self.posts_dir = posts_dir
         self.posts: Dict[str, Post] = {}
         self.tags: Dict[str, Tag] = {}
         self.search_index: Optional[sqlite3.Connection] = None
-        self.search_method: Literal['fullmatch', 'jieba'] = search_method
-        if self.search_method == 'jieba':
-            print("AmiaBlog | Initializing jieba predix dict")
+        self.search_method: Literal["fullmatch", "jieba"] = search_method
+        if self.search_method == "jieba":
+            logger.info("Initializing jieba predix dict")
             jieba_fast.initialize()
-        elif self.search_method == 'fullmatch':
+        elif self.search_method == "fullmatch":
             pass
         else:
             raise ValueError("Invalid search method.")
@@ -150,7 +164,7 @@ class PostsManager:
         if self.search_index:
             self.search_index.close()
             self.search_index = None
-        print("AmiaBlog | Loading posts")
+        logger.info("Loading posts")
         start_time = time.time()
         for filename in os.listdir(self.posts_dir):
             if filename.endswith(".md"):
@@ -159,25 +173,27 @@ class PostsManager:
                 try:
                     metadata, content = parse_post(content)
                 except Exception as e:
-                    print(f"AmiaBlog | Error parsing post {filename}, ignoring: {e}")
+                    logger.error(f"Error parsing post {filename}, ignoring: {e}")
                     continue
                 if not metadata.published:
                     continue
                 slug = ".".join(filename.split(".")[:-1])
                 self.posts[slug] = Post(metadata=metadata, content=content, slug=slug)
         end_time = time.time()
-        print(f"AmiaBlog | Loaded {len(self.posts)} posts in {(end_time - start_time)*1000:.4f}ms")
-        print("AmiaBlog | Building tag index")
+        logger.info(
+            f"Loaded {len(self.posts)} posts in {(end_time - start_time)*1000:.4f}ms"
+        )
+        logger.info("Building tag index")
         start_time = time.time()
         self._build_tag_index()
         end_time = time.time()
-        print(f"AmiaBlog | Built tag index in {(end_time - start_time)*1000000:.4f}us")
-        print("AmiaBlog | Building search index")
+        logger.info(f"Built tag index in {(end_time - start_time)*1000000:.4f}us")
+        logger.info("Building search index")
         start_time = time.time()
         self._build_search_index()
         end_time = time.time()
-        print(f"AmiaBlog | Built search index in {(end_time - start_time)*1000:.4f}ms")
-        print("AmiaBlog | Finished loading posts")
+        logger.info(f"Built search index in {(end_time - start_time)*1000:.4f}ms")
+        logger.info("Finished loading posts")
 
     def _build_tag_index(self):
         for post in self.posts.values():
@@ -190,9 +206,20 @@ class PostsManager:
     def _build_search_index(self):
         db = sqlite3.connect(":memory:")
         cursor = db.cursor()
-        cursor.execute("CREATE TABLE posts (id INTEGER PRIMARY KEY, slug TEXT, title TEXT, tags TEXT, content TEXT, keywords TEXT)")
+        cursor.execute(
+            "CREATE TABLE posts (id INTEGER PRIMARY KEY, slug TEXT, title TEXT, tags TEXT, content TEXT, keywords TEXT)"
+        )
         for post in self.posts.values():
-            cursor.execute("INSERT INTO posts (slug, title, tags, content, keywords) VALUES (?, ?, ?, ?, ?)", (post.slug, post.metadata.title.lower(), ",".join(post.metadata.tags).lower(), post.content.lower(), ",".join(post.metadata.keywords).lower()))
+            cursor.execute(
+                "INSERT INTO posts (slug, title, tags, content, keywords) VALUES (?, ?, ?, ?, ?)",
+                (
+                    post.slug,
+                    post.metadata.title.lower(),
+                    ",".join(post.metadata.tags).lower(),
+                    post.content.lower(),
+                    ",".join(post.metadata.keywords).lower(),
+                ),
+            )
         db.commit()
         self.search_index = db
 
@@ -207,9 +234,7 @@ class PostsManager:
             )
 
     def recent_posts(self, n: int = 5) -> List[Post]:
-        return self.order_by(
-            list(self.posts.values()), "modified_desc"
-        )[:n]
+        return self.order_by(list(self.posts.values()), "modified_desc")[:n]
 
     def get_posts(self, selector: Callable[[Post], bool]) -> List[Post]:
         return [post for post in self.posts.values() if selector(post)]
@@ -217,28 +242,40 @@ class PostsManager:
     def search(self, keyword: str) -> List[Post]:
         if self.search_index is None:
             raise ValueError("Search index not built.")
-        print(f"AmiaBlog | Performing '{self.search_method}' search within {len(self.posts)} post(s)")
+        logger.info(
+            f"Performing '{self.search_method}' search within {len(self.posts)} post(s)"
+        )
         start_time = time.time()
-        if self.search_method == 'fullmatch':
+        if self.search_method == "fullmatch":
             cursor = self.search_index.cursor()
             keyword = keyword.lower()
-            cursor.execute("SELECT slug FROM posts WHERE slug LIKE ? OR title LIKE ? OR tags LIKE ? OR keywords LIKE ?", (f"%{keyword}%", f"%{keyword}%", f"%{keyword}%", f"%{keyword}%"))
+            cursor.execute(
+                "SELECT slug FROM posts WHERE slug LIKE ? OR title LIKE ? OR tags LIKE ? OR keywords LIKE ?",
+                (f"%{keyword}%", f"%{keyword}%", f"%{keyword}%", f"%{keyword}%"),
+            )
             results = [self.posts[row[0]] for row in cursor.fetchall()]
-        elif self.search_method == 'jieba':
+        elif self.search_method == "jieba":
             keywords = jieba_fast.lcut(keyword.lower())
             cursor = self.search_index.cursor()
             hits: Dict[str, int] = {}
             for kw in keywords:
-                cursor.execute("SELECT slug FROM posts WHERE title LIKE ? OR tags LIKE ? OR content LIKE ? OR keywords LIKE ?", (f"%{kw}%", f"%{kw}%", f"%{kw}%", f"%{kw}%"))
+                cursor.execute(
+                    "SELECT slug FROM posts WHERE title LIKE ? OR tags LIKE ? OR content LIKE ? OR keywords LIKE ?",
+                    (f"%{kw}%", f"%{kw}%", f"%{kw}%", f"%{kw}%"),
+                )
                 for row in cursor.fetchall():
                     slug = row[0]
                     hits[slug] = hits.get(slug, 0) + 1
-            sorted_slugs = sorted(hits.keys(), key=lambda slug: hits[slug], reverse=True)
+            sorted_slugs = sorted(
+                hits.keys(), key=lambda slug: hits[slug], reverse=True
+            )
             results = [self.posts[slug] for slug in sorted_slugs]
         else:
             raise ValueError("Invalid search method.")
         end_time = time.time()
-        print(f"AmiaBlog | Search completed in {(end_time - start_time)*1000:.4f} milliseconds returning {len(results)} result(s)")
+        logger.info(
+            f"Search completed in {(end_time - start_time)*1000:.4f} milliseconds returning {len(results)} result(s)"
+        )
         return results
 
     def get_posts_by_tag(self, tag: str, limit: Optional[int] = None) -> List[Post]:
@@ -319,7 +356,7 @@ class HLJSLanguageManager:
                 self.available_languages.append(language)
         if not undownloaded_languages:
             return
-        print(f"AmiaBlog | Downloading {len(undownloaded_languages)} HLJS languages...")
+        logger.info(f"Downloading {len(undownloaded_languages)} HLJS languages...")
         for language in undownloaded_languages:
             try:
                 response = httpx.get(f"{url_prefix}{language}.min.js")
@@ -327,13 +364,11 @@ class HLJSLanguageManager:
                 with open(os.path.join(prefix, f"{language}.min.js"), "wb") as f:
                     f.write(response.content)
             except Exception as e:
-                print(
-                    f"AmiaBlog | Failed to download {language}.min.js: {e}, skipping."
-                )
+                logger.warning(f"Failed to download {language}.min.js: {e}, skipping.")
             else:
-                print(f"AmiaBlog | Successfully downloaded {language}.min.js")
+                logger.info(f"Successfully downloaded {language}.min.js")
                 self.available_languages.append(language)
-        print("AmiaBlog | Download complete!")
+        logger.info("Download complete!")
 
     def get_markdown_languages(self, markdown_text: str):
         languages = []
@@ -383,19 +418,29 @@ class RSSProvider:
         # Start building RSS XML
         rss_parts = []
         rss_parts.append('<?xml version="1.0" encoding="UTF-8"?>')
-        rss_parts.append('<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">')
-        rss_parts.append('  <channel>')
-        rss_parts.append(f'    <title>{channel_title}</title>')
-        rss_parts.append(f'    <description>{channel_description}</description>')
-        rss_parts.append(f'    <link>{channel_link}</link>')
-        rss_parts.append(f'    <lastBuildDate>{last_build_date}</lastBuildDate>')
-        rss_parts.append(f'    <generator>AmiaBlog {get_amiablog_version()}</generator>')
+        rss_parts.append(
+            '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">'
+        )
+        rss_parts.append("  <channel>")
+        rss_parts.append(f"    <title>{channel_title}</title>")
+        rss_parts.append(f"    <description>{channel_description}</description>")
+        rss_parts.append(f"    <link>{channel_link}</link>")
+        rss_parts.append(f"    <lastBuildDate>{last_build_date}</lastBuildDate>")
+        rss_parts.append(
+            f"    <generator>AmiaBlog {get_amiablog_version()}</generator>"
+        )
 
         # Add atom:self link
-        rss_parts.append(f'    <atom:link href="{channel_link}/feed" rel="self" type="application/rss+xml" />')
-        rss_parts.append(f'    <language>{escape(self.config.site_language)}</language>')
+        rss_parts.append(
+            f'    <atom:link href="{channel_link}/feed" rel="self" type="application/rss+xml" />'
+        )
+        rss_parts.append(
+            f"    <language>{escape(self.config.site_language)}</language>"
+        )
         if self.config.copyright:
-            rss_parts.append(f'    <copyright>{escape(self.config.copyright.name)} {escape(self.config.copyright.refer)}</copyright>')
+            rss_parts.append(
+                f"    <copyright>{escape(self.config.copyright.name)} {escape(self.config.copyright.refer)}</copyright>"
+            )
 
         # Add items for each post
         for post in posts:
@@ -406,21 +451,23 @@ class RSSProvider:
             author = escape(post.metadata.author)
             guid = escape(post_url)
 
-            rss_parts.append('    <item>')
-            rss_parts.append(f'      <title>{title}</title>')
-            rss_parts.append(f'      <link>{post_url}</link>')
-            rss_parts.append(f'      <description>{description}</description>')
-            rss_parts.append(f'      <pubDate>{pub_date}</pubDate>')
-            rss_parts.append(f'      <guid>{guid}</guid>')
-            rss_parts.append(f'      <author>{author}</author>')
-            rss_parts.append(f'      <content:encoded xml:lang=\"{escape(self.config.site_language)}\"><![CDATA[{post.content}]]></content:encoded>')
+            rss_parts.append("    <item>")
+            rss_parts.append(f"      <title>{title}</title>")
+            rss_parts.append(f"      <link>{post_url}</link>")
+            rss_parts.append(f"      <description>{description}</description>")
+            rss_parts.append(f"      <pubDate>{pub_date}</pubDate>")
+            rss_parts.append(f"      <guid>{guid}</guid>")
+            rss_parts.append(f"      <author>{author}</author>")
+            rss_parts.append(
+                f'      <content:encoded xml:lang="{escape(self.config.site_language)}"><![CDATA[{post.content}]]></content:encoded>'
+            )
             # Add categories (tags)
             for tag in post.metadata.tags:
                 escaped_tag = escape(tag)
-                rss_parts.append(f'      <category>{escaped_tag}</category>')
-            rss_parts.append('    </item>')
+                rss_parts.append(f"      <category>{escaped_tag}</category>")
+            rss_parts.append("    </item>")
 
-        rss_parts.append('  </channel>')
-        rss_parts.append('</rss>')
+        rss_parts.append("  </channel>")
+        rss_parts.append("</rss>")
 
         return "\n".join(rss_parts)
