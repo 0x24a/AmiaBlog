@@ -38,6 +38,7 @@ AmiaBlog is a simple blog system that emphasizes simplicity, customization, and 
 - Material Design You: Material Design You UI using MDUIv2
 
 ### Performance
+- Static Site Generation Ability: Have an option for you to generate your AmiaBlog instance into a static site
 - High-Performance Search: In-memory SQLite database for lightning-fast queries
 - Fuzzy Search: jieba-fast tokenizer for better fuzzy search results
 - Multiple Search Methods: Choose between `fullmatch` (exact, better performance) or `jieba` (tokenized, better accuracy) search
@@ -94,6 +95,15 @@ For production, consider using Gunicorn with Uvicorn Workers:
 ```bash
 uv run gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000
 ```
+
+### Static Site Generation Ability
+
+To generate your AmiaBlog instance into a static site, you can use the `staticify` command:
+```bash
+uv run staticify.py --destination dist/
+```
+This will generate a static site in the `dist/` directory.
+For more information, see [Static Site Generation](/docs/static-site-generation.md).
 
 ## Contributing
 
