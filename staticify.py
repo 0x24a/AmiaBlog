@@ -122,13 +122,7 @@ class AmiaBlogStaticGenerator:
     
     def write_build_info(self, build_time, build_time_usage):
         with open(os.path.join(self.destination, "amiablog_build_info.txt"), "w+") as f:
-            f.write(f"""
-        software: AmiaBlog
-        python_version: {sys.version}
-        platform: {get_platform_string()}
-        build_time: {build_time}
-        build_time_usage: {build_time_usage}ms
-        """.strip())
+            f.write(f"software: AmiaBlog\npython_version: {sys.version}\nplatform: {get_platform_string()}\nbuild_time: {build_time}\nbuild_time_usage: {round(build_time_usage,2)}ms\n")
     
     def render(self):
         build_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -154,7 +148,7 @@ class AmiaBlogStaticGenerator:
         logger.info(
             f"Generation completed in {(generate_end_time - generate_start_time)*1000:.2f} ms. Writing amiablog_build_info.txt"
         )
-        self.write_build_info(build_time, generate_end_time - generate_start_time)
+        self.write_build_info(build_time, round((generate_end_time - generate_start_time)*1000,2))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate AmiaBlog static site")
