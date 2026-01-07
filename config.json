@@ -15,7 +15,7 @@
     "name": "CC-BY-SA 4.0",
     "refer": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
   },
-  "site_language": "en",
+  "site_language": "zh-CN",
   "search_method": "jieba",
   "disable_template_cache": true
 }
