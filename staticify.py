@@ -39,7 +39,7 @@ class AmiaBlogStaticGenerator:
                 "config": self.config,
                 "i18n": self.i18n,
                 "backend_version": (
-                    __VERSION__ if __VERSION__ else "unknown" + "-static"
+                    (__VERSION__ if __VERSION__ else "unknown") + "-static"
                 ),
                 "total_posts": len(self.posts_manager.posts),
                 "copyright": self.config.copyright,
