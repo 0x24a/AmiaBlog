@@ -97,7 +97,7 @@ class AmiaBlogStaticGenerator:
             logger.info("\tRendering: friend-links.html")
             self.renderer.render_static(
                 os.path.join(self.destination, "friend-links.html"),
-                "friend-links.html",
+                "friend_links.html",
                 friend_links=self.config.friend_links,
             )
         logger.info("\tRendering: 404.html (need extra configuration to work)")
