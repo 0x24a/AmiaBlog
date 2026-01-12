@@ -38,6 +38,9 @@
             {% endif %}
             <mdui-list-item icon="tag" end-icon="arrow_forward" href="/tags{% if is_static %}.html{% endif %}">{{ i18n.tags }}</mdui-list-item>
             <mdui-list-item icon="list" end-icon="arrow_forward" href="/posts{% if is_static %}.html{% endif %}">{{ i18n.all_posts }}</mdui-list-item>
+            {% if config.friend_links %}
+            <mdui-list-item icon="link" end-icon="arrow_forward" href="/friend-links{% if is_static %}.html{% endif %}">{{ i18n.friend_links }}</mdui-list-item>
+            {% endif %}
             <mdui-list-item icon="info" end-icon="arrow_forward" onclick="mdui.$('#about')[0].open = true">{{ i18n.about }}</mdui-list-item>
           </mdui-list>
           <!-- fix at bottom -->

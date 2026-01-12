@@ -15,6 +15,13 @@
     "name": "CC-BY-SA 4.0",
     "refer": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
   },
+  "friend_links": [
+    {
+      "name": "AmiaBlog Github",
+      "url": "https://github.com/0x24a/AmiaBlog",
+      "description": "AmiaBlog's Github repository"
+    }
+  ],
   "site_language": "zh-CN",
   "search_method": "jieba",
   "disable_template_cache": true

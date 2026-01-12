@@ -130,6 +130,11 @@ async def view_search(
         search_time=round((end_time - start_time) * 1000, 4),
     )
 
+@app.get("/friend-links")
+async def view_friend_links():
+    if not config.friend_links:
+        return renderer.render("error.html", status_code=404, error=i18n.error_not_found)
+    return renderer.render("friend_links.html", friend_links=config.friend_links)
 
 @app.get("/api/health")
 async def root():

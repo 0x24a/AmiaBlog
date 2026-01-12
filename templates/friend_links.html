@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}{{ i18n.friend_links }} - {{ config.site_settings.title }}{% endblock %}
+
+{% block content %}
+    <p style="font-size: x-large;">{{ i18n.friend_links }}</p>
+    <p>{{ i18n.friend_links_desc }}</p>
+    <br>
+    <mdui-divider></mdui-divider>
+    <br>
+    {% if friend_links %}
+        <mdui-list>
+        {% for link in friend_links %}
+            <a href="{{ link.url }}" style="text-decoration: none;" target="_blank"> <!-- For search engines to follow -->
+                <mdui-list-item>
+                    {{ link.name }}
+                    <span slot="description">{{ link.description }}</span>
+                </mdui-list-item>
+            </a>
+        {% endfor %}
+        </mdui-list>
+    {% endif %}
+    <br>
+{% endblock %}

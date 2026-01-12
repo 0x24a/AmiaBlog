@@ -32,6 +32,11 @@ class CopyrightSettings(BaseModel):
     name: str
     refer: str
 
+class FriendLinkItem(BaseModel):
+    name: str
+    url: str
+    description: str
+
 
 class Config(BaseModel):
     site_settings: SiteSettings
@@ -39,6 +44,7 @@ class Config(BaseModel):
     copyright: Optional[CopyrightSettings] = None
     search_method: Literal["fullmatch", "jieba"] = "fullmatch"
     cloudflare_analytics_token: Optional[str] = None
+    friend_links: Optional[List[FriendLinkItem]] = None
 
     # Debug flags
     disable_template_cache: bool = False
