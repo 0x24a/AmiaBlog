@@ -2,6 +2,8 @@
 
 {% block title %}{{ i18n.tags_view }} - {{ config.site_settings.title }}{% endblock %}
 
+{% block meta_description %}{{ i18n.tags_view_meta_desc }}{% endblock %}
+
 {% block content %}
     <p style="font-size: x-large;">{{ i18n.tags_view }}</p>
     <p>{{ i18n.tags_view_desc }}<br>{{ i18n.tags_view_count.format(n_tags) }}</p>

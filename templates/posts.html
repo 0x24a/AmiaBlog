@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block meta_description %}{{ i18n.all_posts_desc }}{% endblock %}
+
 {% block content %}
     <p style="font-size: x-large;">{{ i18n.all_posts }}</p>
     {% if not is_static %}
