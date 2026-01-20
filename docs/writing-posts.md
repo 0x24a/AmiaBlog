@@ -57,4 +57,8 @@ author: Your Name
 You can enable hot reloading by setting the `hot_reload` flag to `true` in your `config.json` file.
 You can also modify the `hot_reload_interval` field to adjust the interval between changes checks. (in seconds, default is 1s)
 
+# Attachments
+If you have attachments to add, no matter what format they are, you can place them in the `attachments` directory and reference them in your posts using the `/attachments` URL prefix.
+For an example, please see posts/amiablog-test-another-post.md, where I added a cute mizuki.
+
 [← Back to README](../README.md)
