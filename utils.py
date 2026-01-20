@@ -32,6 +32,7 @@ class CopyrightSettings(BaseModel):
     name: str
     refer: str
 
+
 class FriendLinkItem(BaseModel):
     name: str
     url: str

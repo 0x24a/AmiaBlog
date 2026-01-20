@@ -17,6 +17,7 @@ from loguru import logger
 
 __VERSION__ = get_amiablog_version()
 
+
 class AmiaBlogStaticGenerator:
     def __init__(self, destination: str, remove_existing: bool = False):
         self.destination = destination
