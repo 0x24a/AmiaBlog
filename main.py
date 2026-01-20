@@ -20,7 +20,11 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 config = load_config()
 hljs_manager = HLJSLanguageManager(config.site_settings.hljs_languages)
-posts_manager = PostsManager(search_method=config.search_method)
+posts_manager = PostsManager(
+    search_method=config.search_method,
+    hot_reload=config.hot_reload,
+    hot_reload_interval=config.hot_reload_interval,
+)
 i18n = I18nProvider(config.site_language)
 renderer = TemplateRenderer(
     disable_cache=config.disable_template_cache,

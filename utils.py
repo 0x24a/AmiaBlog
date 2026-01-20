@@ -2,10 +2,12 @@ import datetime
 import json
 import os
 import sqlite3
+import threading
 import time
 import jieba_fast
-from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union
 from urllib.parse import quote
+from hashlib import md5
 
 import htmlmin
 import httpx
@@ -49,6 +51,8 @@ class Config(BaseModel):
 
     # Debug flags
     disable_template_cache: bool = False
+    hot_reload: bool = False
+    hot_reload_interval: Union[int, float] = 1
 
 
 class PostMetadata(BaseModel):
@@ -176,13 +180,18 @@ class PostsManager:
         self,
         posts_dir: str = "posts",
         search_method: Literal["fullmatch", "jieba"] = "fullmatch",
-        build_search_index: bool = True,
+        build_search_index: bool = False,
+        hot_reload: bool = True,
+        hot_reload_interval: Union[int, float] = 1,
     ) -> None:
         self.posts_dir = posts_dir
         self.posts: Dict[str, Post] = {}
         self.tags: Dict[str, Tag] = {}
+        self.build_search_index = build_search_index
         self.search_index: Optional[sqlite3.Connection] = None
         self.search_method: Literal["fullmatch", "jieba"] = search_method
+        self.hot_reload: bool = hot_reload
+        self.hot_reload_interval: Union[int, float] = hot_reload_interval
         if self.search_method == "jieba":
             logger.info("Initializing jieba predix dict")
             jieba_fast.initialize()
@@ -191,13 +200,37 @@ class PostsManager:
         else:
             raise ValueError("Invalid search method.")
         self.load_posts(build_search_index)
+        if hot_reload:
+            self.reload_thread = threading.Thread(target=self._reload_thread)
+            self.reload_thread.start()
+
+    def calculate_posts_signature(self) -> str:
+        crypto = md5()
+        for filename in os.listdir(self.posts_dir):
+            if filename.endswith(".md"):
+                with open(os.path.join(self.posts_dir, filename), "rb") as f:
+                    crypto.update(f.read())
+        return crypto.hexdigest()
+
+    def _reload_thread(self):
+        logger.info(
+            f"Listening for changes every {self.hot_reload_interval} second(s)..."
+        )
+        last_signature = self.calculate_posts_signature()
+        while True:
+            time.sleep(self.hot_reload_interval)
+            current_signature = self.calculate_posts_signature()
+            if current_signature != last_signature:
+                logger.info("Post changes detected, reloading...")
+                self.load_posts(self.build_search_index)
+                last_signature = current_signature
 
     def load_posts(self, build_search_index: bool = True) -> None:
         # Clear posts & db
         self.posts.clear()
         self.tags.clear()
         if self.search_index:
-            self.search_index.close()
+            del self.search_index
             self.search_index = None
         logger.info("Loading posts")
         start_time = time.time()
