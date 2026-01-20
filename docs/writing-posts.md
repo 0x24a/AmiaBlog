@@ -53,4 +53,8 @@ author: Your Name
 
 ---
 
+# Hot reloading
+You can enable hot reloading by setting the `hot_reload` flag to `true` in your `config.json` file.
+You can also modify the `hot_reload_interval` field to adjust the interval between changes checks. (in seconds, default is 1s)
+
 [← Back to README](../README.md)
