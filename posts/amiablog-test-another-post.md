@@ -9,3 +9,6 @@ author: AnotherAmiaBlog
 This is a test post, for AmiaBlog's testing purposes.  
 `markdown` and $\LaTeX$ are supported.  
 $$E = mc^2$$
+
+Here is a cute mizuki.
+![Mizuki](/attachments/mizukichibi.png)

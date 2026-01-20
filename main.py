@@ -17,6 +17,7 @@ __VERSION__ = get_amiablog_version()
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/attachments", StaticFiles(directory="attachments"), name="attachments")
 
 config = load_config()
 hljs_manager = HLJSLanguageManager(config.site_settings.hljs_languages)
