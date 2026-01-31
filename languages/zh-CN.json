@@ -5,7 +5,7 @@
   "no_posts": "目前没有任何已发布的文章。",
   "all_posts": "所有文章",
   "all_posts_desc": "在此处查看该博客的所有文章。",
-  "powered_by": "由 AmiaBlog V{} 驱动",
+  "powered_by": "由 AmiaBlog v{} 驱动",
   "powered_by_desc": "一个基于 FastAPI & MDUIv2 打造的简约博客系统。",
   "github_repo": "Github 仓库",
   "copyright": "如未特别说明，则本页内容使用 {} 协议共享。",

@@ -5,7 +5,7 @@
   "no_posts": "No posts have been published, yet.",
   "all_posts": "All Posts",
   "all_posts_desc": "View all posts on this blog.",
-  "powered_by": "Powered by AmiaBlog V{}",
+  "powered_by": "Powered by AmiaBlog v{}",
   "powered_by_desc": "A simple blog system built with FastAPI & MDUIv2.",
   "github_repo": "Github repository",
   "copyright": "If not specified, the page is shared under {} license.",
