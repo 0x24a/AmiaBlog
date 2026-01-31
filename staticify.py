@@ -29,7 +29,7 @@ class AmiaBlogStaticGenerator:
             self.config.site_settings.hljs_languages
         )
         self.posts_manager = PostsManager(
-            search_method="fullmatch", build_search_index=False
+            search_method="fullmatch", build_search_index=False, hot_reload=False
         )
         self.i18n = I18nProvider(self.config.site_language)
         self.renderer = TemplateRenderer(
