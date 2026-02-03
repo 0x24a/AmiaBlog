@@ -38,7 +38,7 @@
   "error_title": "出现错误",
   "error_occured": "AmiaBlog 在处理该请求时出现了问题。",
   "error_desc": "详细信息: {}",
-  "error_redirect": "5 秒后将返回上一页面…",
+  "error_redirect": "%COUNTDOWN% 秒后将返回上一页面…",
   "friend_links": "友情链接",
   "friend_links_desc": "在此处查看相关站点。",
   "error_relevance_in_fullmatch": "当前服务端搜索模式不支持按相关性排序，请联系管理员切换到 'jieba' 搜索模式。",

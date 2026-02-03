@@ -12,23 +12,27 @@
     <br>
     <div style="display: flex; align-items: center; flex-wrap: wrap;">
         <span style="display: inline-flex; align-items: center; gap: 0.8rem;">
-            <mdui-circular-progress max="1" min="0" value="1" style="width: 1.5em; height: 1.5em;" id="progress"></mdui-circular-progress> {{ i18n.error_redirect }}
+            <mdui-circular-progress max="1" min="0" value="1" style="width: 1.5em; height: 1.5em;" id="progress"></mdui-circular-progress> <span id="countdown"></span>
         </span>
     </div>
     <br>
 {% endblock %}
 {% block extra_scripts %}
     <script>
+    const COUNTDOWN_TEXT = "{{ i18n.error_redirect }}";
     function updateProgress() {
         const progress = document.getElementById('progress');
+        const countdown = document.getElementById('countdown');
         const duration = 5000;
         const interval = 1000;
         let elapsed = 0;
+        countdown.textContent = COUNTDOWN_TEXT.replace('%COUNTDOWN%', Math.ceil(duration / 1000));
 
         const update = () => {
             elapsed += interval;
             const progressValue = Math.max(0, 1 - (elapsed / duration));
             progress.setAttribute('value', progressValue);
+            countdown.textContent = COUNTDOWN_TEXT.replace('%COUNTDOWN%', Math.ceil((duration - elapsed) / 1000));
 
             if (elapsed < duration) {
                 setTimeout(update, interval);

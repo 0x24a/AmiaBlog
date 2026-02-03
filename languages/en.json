@@ -38,7 +38,7 @@
   "error_title": "Error",
   "error_occured": "AmiaBlog encountered an error.",
   "error_desc": "Error Details: {}",
-  "error_redirect": "Redirecting you to the last page after 5 seconds...",
+  "error_redirect": "Redirecting you to the last page after %COUNTDOWN% seconds...",
   "friend_links": "Friend Links",
   "friend_links_desc": "View related sites here.",
   "error_relevance_in_fullmatch": "Relevance search is not available because the server is using 'fullmatch' matching method. Ask the site owner to switch to 'jieba' matching method.",
