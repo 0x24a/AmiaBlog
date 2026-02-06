@@ -7,9 +7,9 @@
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <meta name="description" content="{% block meta_description %}{{ config.site_settings.description }}{% endblock %}">
     <meta name="keywords" content="{% block meta_keywords %}{{ config.site_settings.keywords }}{% endblock %}">
-    {% if config.site_settings.cloudflare_analytics_token %}
+    {% if config.cloudflare_analytics_token %}
     <!-- Cloudflare Web Analytics -->
-    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "{{ config.site_settings.cloudflare_analytics_token }}"}'></script>
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "{{ config.cloudflare_analytics_token }}"}'></script>
     <!-- End Cloudflare Web Analytics -->
     {% endif %}
     <link rel="stylesheet" href="/static/mdui_2.1.4/mdui.css">
