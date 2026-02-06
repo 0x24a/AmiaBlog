@@ -27,8 +27,8 @@
 
     <title>{% block title %}{{ config.site_settings.title }}{% endblock %}</title>
   </head>
-  <body>
-      <mdui-navigation-drawer close-on-overlay-click modal class="sidenav">
+  <body role="main">
+      <mdui-navigation-drawer close-on-overlay-click modal class="sidenav" role="navigation">
           <mdui-button-icon icon="close" onclick="toggleSideNav();" style="float: right; margin: 12px;"></mdui-button-icon>
           <div style="height: 15%;"></div>
           <mdui-list>
@@ -49,7 +49,7 @@
           <br>
           <p style="text-align: center; color:rgb(var(--mdui-color-on-surface-variant));">{{ i18n.powered_by.format(backend_version) }}<br><br><span style="font-size: small;">{{ i18n.powered_by_desc }}</span></p>
       </mdui-navigation-drawer>
-      <mdui-top-app-bar>
+      <mdui-top-app-bar role="banner">
         <mdui-button-icon icon="menu" onclick="toggleSideNav();"></mdui-button-icon>
         <a href="/" style="text-decoration: none;"><mdui-top-app-bar-title>{{ config.site_settings.title }}</mdui-top-app-bar-title></a>
         <div style="flex-grow: 1"></div>
@@ -58,7 +58,7 @@
         <mdui-button-icon icon="more_vert" onclick="mdui.$('#about')[0].open = true"></mdui-button-icon>
       </mdui-top-app-bar>
 
-      <div style="max-width: 90%; padding-left: 5%;">
+      <div style="max-width: 90%; padding-left: 5%;" role="contentinfo">
           {% block content %}{% endblock %}
           {% block copyright %}
           {% if copyright %}
