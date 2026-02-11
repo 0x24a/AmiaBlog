@@ -84,6 +84,9 @@ def load_config(filename: str = "config.json") -> Config:
         logger.warning(
             "config.site_settings.site_url is not set. RSS feed might break. Using https://example.com/"
         )
+        config.site_settings.site_url = "https://example.com/"
+    if not config.site_settings.site_url.endswith("/"):
+        config.site_settings.site_url += "/"
     return config
 
 
