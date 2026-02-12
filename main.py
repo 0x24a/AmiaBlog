@@ -22,13 +22,13 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/attachments", StaticFiles(directory="attachments"), name="attachments")
 
 config = load_config()
-hljs_manager = HLJSLanguageManager(config.site_settings.hljs_languages)
+hljs_manager = HLJSLanguageManager(languages = config.site_settings.hljs_languages)
 posts_manager = PostsManager(
     search_method=config.search_method,
     hot_reload=config.hot_reload,
     hot_reload_interval=config.hot_reload_interval,
 )
-i18n = I18nProvider(config.site_language)
+i18n = I18nProvider(language = config.site_language)
 renderer = TemplateRenderer(
     disable_cache=config.disable_template_cache,
     static_params={
@@ -40,8 +40,15 @@ renderer = TemplateRenderer(
         "copyright": config.copyright,
     },
 )
-rss_provider = RSSProvider(config, posts_manager)
-sitemap_provider = SitemapProvider(posts_manager, config, False)
+rss_provider = RSSProvider(
+    config=config,
+    posts_manager=posts_manager
+)
+sitemap_provider = SitemapProvider(
+    config=config,
+    posts_manager=posts_manager,
+    is_static=False
+)
 sitemap = sitemap_provider.generate_sitemap()
 
 
