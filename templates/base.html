@@ -47,7 +47,14 @@
           <br><br>
           <mdui-divider></mdui-divider>
           <br>
-          <p style="text-align: center; color:rgb(var(--mdui-color-on-surface-variant));">{{ i18n.powered_by.format(backend_version) }}<br><br><span style="font-size: small;">{{ i18n.powered_by_desc }}</span></p>
+          <p style="text-align: center; color:rgb(var(--mdui-color-on-surface-variant));">
+              {{ i18n.powered_by.format(backend_version) }}<br>
+              {% if commit_hash %}
+              <span style="color: rgb(var(--mdui-color-outline)); font-size: small;">{{ i18n.powered_by_commit.format(commit_hash) }}</span><br>
+              {% endif %}
+              <br>
+              <span style="font-size: small;">{{ i18n.powered_by_desc }}</span>
+          </p>
       </mdui-navigation-drawer>
       <mdui-top-app-bar role="banner">
         <mdui-button-icon icon="menu" onclick="toggleSideNav();"></mdui-button-icon>
@@ -81,7 +88,10 @@
             <br>
             <mdui-divider></mdui-divider>
             <p>
-            {{ i18n.powered_by.format(backend_version) }}
+            {{ i18n.powered_by.format(backend_version) }}<br>
+            {% if commit_hash %}
+            <span style="color: rgb(var(--mdui-color-outline)); font-size: small;">{{ i18n.powered_by_commit.format(commit_hash) }}</span><br>
+            {% endif %}
             <br>{{ i18n.powered_by_desc }}
             <div class="mdui-prose"><a href="https://github.com/0x24a/AmiaBlog" target="_blank">{{ i18n.github_repo }}</a></div>
             {% if is_static %}

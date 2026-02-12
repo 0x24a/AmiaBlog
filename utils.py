@@ -177,6 +177,14 @@ def get_platform_string():
 
     return f"{final_os}-{final_arch}-none"
 
+def get_commit_hash(length: int = 7) -> Optional[str]:
+    try:
+        commit_hash = os.popen("git rev-parse HEAD").read().strip()
+        assert all([ char in "0123456789abcedf" for char in commit_hash])
+        return commit_hash[:length] if length != 0 else commit_hash
+    except Exception:
+        return None
+
 
 class PostsManager:
     def __init__(

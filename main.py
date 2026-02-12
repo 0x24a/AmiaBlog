@@ -5,6 +5,7 @@ from fastapi.responses import FileResponse, Response
 from utils import (
     load_config,
     get_amiablog_version,
+    get_commit_hash,
     TemplateRenderer,
     PostsManager,
     I18nProvider,
@@ -33,6 +34,7 @@ renderer = TemplateRenderer(
         "config": config,
         "i18n": i18n,
         "backend_version": __VERSION__,
+        "commit_hash": get_commit_hash(),
         "total_posts": len(posts_manager.posts),
         "copyright": config.copyright,
     },
