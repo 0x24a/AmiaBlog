@@ -33,7 +33,7 @@ class AmiaBlogStaticGenerator:
         self.posts_manager = PostsManager(
             search_method="fullmatch", build_search_index=False, hot_reload=False
         )
-        self.i18n = I18nProvider(self.config.site_language)
+        self.i18n = I18nProvider(language=self.config.site_language)
         self.renderer = TemplateRenderer(
             disable_cache=True,
             static_params={
@@ -48,8 +48,15 @@ class AmiaBlogStaticGenerator:
                 "is_static": True,
             },
         )
-        self.rss_provider = RSSProvider(self.config, self.posts_manager)
-        self.sitemap_provider = SitemapProvider(self.posts_manager, self.config, True)
+        self.rss_provider = RSSProvider(
+            config=self.config,
+            posts_manager=self.posts_manager
+        )
+        self.sitemap_provider = SitemapProvider(
+            config=self.config,
+            posts_manager=self.posts_manager,
+            is_static=True
+        )
 
     def init_dist_dir(self):
         if os.path.exists(self.destination):
