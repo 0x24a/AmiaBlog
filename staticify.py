@@ -9,6 +9,7 @@ from utils import (
     I18nProvider,
     HLJSLanguageManager,
     RSSProvider,
+    SitemapProvider
 )
 import os
 import time
@@ -48,6 +49,7 @@ class AmiaBlogStaticGenerator:
             },
         )
         self.rss_provider = RSSProvider(self.config, self.posts_manager)
+        self.sitemap_provider = SitemapProvider(self.posts_manager, self.config, True)
 
     def init_dist_dir(self):
         if os.path.exists(self.destination):
@@ -75,6 +77,9 @@ class AmiaBlogStaticGenerator:
         logger.info("\tRendering: RSS Feed")
         with open(os.path.join(self.destination, "feed.xml"), "w+") as f:
             f.write(self.rss_provider.generate_rss(is_static=True))
+        logger.info("\tRendering: Sitemap")
+        with open(os.path.join(self.destination, "sitemap.xml"), "w+") as f:
+            f.write(self.sitemap_provider.generate_sitemap())
         logger.info("\tRendering: index.html")
         self.renderer.render_static(
             os.path.join(self.destination, "index.html"),

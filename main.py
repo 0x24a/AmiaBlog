@@ -11,6 +11,7 @@ from utils import (
     I18nProvider,
     HLJSLanguageManager,
     RSSProvider,
+    SitemapProvider
 )
 import time
 
@@ -40,6 +41,8 @@ renderer = TemplateRenderer(
     },
 )
 rss_provider = RSSProvider(config, posts_manager)
+sitemap_provider = SitemapProvider(posts_manager, config, False)
+sitemap = sitemap_provider.generate_sitemap()
 
 
 @app.get("/favicon.ico")
@@ -57,6 +60,13 @@ async def rss():
     return Response(
         rss_provider.generate_rss(),
         media_type="application/rss+xml; charset=utf-8",
+    )
+
+@app.get("/sitemap.xml")
+async def sitemap_view():
+    return Response(
+        sitemap,
+        media_type="application/xml; charset=utf-8",
     )
 
 
