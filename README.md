@@ -14,8 +14,8 @@
 
 
 
-AmiaBlog is a simple blog system that emphasizes simplicity, customization, and speed. It uses Markdown for content, In-memory SQLite for search, and provides i18n support out of the box.
-*Tips: Do you know after v1.3.0, you can [deploy AmiaBlog using Github Actions & Github Pages](https://github.com/0x24a/AmiaBlog-GitHub-Pages-Template)?*
+AmiaBlog is a simple blog system that emphasizes simplicity, customization, and speed. It uses Markdown for content, In-memory SQLite for search, and provides i18n support out of the box.  
+*Tip: Do you know after v1.3.0, you can [deploy AmiaBlog using Github Actions & Github Pages](https://github.com/0x24a/AmiaBlog-GitHub-Pages-Template)?*  
 
 ## Table of Contents
 
