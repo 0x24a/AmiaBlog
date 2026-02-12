@@ -3,6 +3,7 @@ from utils import (
     load_config,
     get_amiablog_version,
     get_platform_string,
+    get_commit_hash,
     TemplateRenderer,
     PostsManager,
     I18nProvider,
@@ -42,6 +43,7 @@ class AmiaBlogStaticGenerator:
                 ),
                 "total_posts": len(self.posts_manager.posts),
                 "copyright": self.config.copyright,
+                "commit_hash": get_commit_hash(),
                 "is_static": True,
             },
         )
