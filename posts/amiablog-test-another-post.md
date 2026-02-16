@@ -1,3 +1,4 @@
+---
 title: Another Post
 date: 2026-01-02
 last_modified: 2026-01-02

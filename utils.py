@@ -125,21 +125,74 @@ class TemplateRenderer:
         return destination
 
 
-def parse_post(content: str) -> Tuple[PostMetadata, str]:
+def parse_post(filename: str, content: str) -> Tuple[PostMetadata, str]:
     """
     Parses a post from its content.
+    
+    Supports both formats:
+    - Standard YAML front matter: content starting with "---", metadata, then "---"
+    - Legacy format: metadata without delimiters at the start
+    
+    Args:
+        filename (str): The filename of the post.
+        content (str): The content of the post.
+        
+    Returns:
+        Tuple[PostMetadata, str]: A tuple containing the metadata and the rest content of the post in markdown.
+    """
+    lines = content.split("\n")
+    
+    if lines and lines[0].strip() == "---":
+        metadata_lines = []
+        content_start_idx = None
+        
+        # Find the closing "---"
+        for i, line in enumerate(lines[1:], start=1):
+            if line.strip() == "---":
+                content_start_idx = i + 1
+                break
+            metadata_lines.append(line)
+        
+        if content_start_idx is None:
+            logger.warning(
+                f"Post '{filename}' starts with '---' but no closing delimiter found. "
+                "Treating as legacy format. Please use proper YAML frontmatter: "
+                "---\\nmetadata\\n---\\ncontent"
+            )
+            return _parse_legacy_format(content)
+        
+        metadata = yaml.safe_load("\n".join(metadata_lines))
+        content_lines = lines[content_start_idx:]
+        
+    else:
+        logger.warning(
+            f"Post '{filename}' uses legacy format without YAML frontmatter delimiters. "
+            "Please migrate to standard format: ---\\nmetadata\\n---\\ncontent"
+        )
+        return _parse_legacy_format(content)
+    
+    if isinstance(metadata.get("tags"), list):
+        metadata["tags"] = [str(tag) for tag in metadata["tags"]]
+    
+    metadata = PostMetadata.model_validate(metadata)
+    return metadata, "\n".join(content_lines)
 
+
+def _parse_legacy_format(content: str) -> Tuple[PostMetadata, str]:
+    """
+    Parses post in legacy format (metadata without delimiters).
+    
     Args:
         content (str): The content of the post.
-
+        
     Returns:
-        Tuple[PostMetadata, str]: A tuple containing the metadata and the rest content of the post (hopefully) in markdown.
+        Tuple[PostMetadata, str]: A tuple containing the metadata and the rest content.
     """
     metadata_lines = []
     content_lines = []
     metadata_end = False
     for line in content.split("\n"):
-        if line == "---":
+        if line.strip() == "---":
             metadata_end = True
             continue
         if not metadata_end:
@@ -250,7 +303,7 @@ class PostsManager:
                 with open(os.path.join(self.posts_dir, filename), "r") as f:
                     content = f.read()
                 try:
-                    metadata, content = parse_post(content)
+                    metadata, content = parse_post(filename, content)
                 except Exception as e:
                     logger.error(f"Error parsing post {filename}, ignoring: {e}")
                     continue
