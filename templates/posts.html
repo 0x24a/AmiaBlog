@@ -50,7 +50,7 @@
 <script>
 function updateOrder(order) {
   setTimeout(() => {
-    window.location.href = `/posts?order=${order}`;
+    window.location.search = `?order=${order}`;
   }, 200);
 }
 </script>
