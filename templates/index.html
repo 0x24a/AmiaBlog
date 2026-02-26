@@ -29,5 +29,13 @@
     {% endfor %}
     {% if not recent_posts %}
         <p>{{ i18n.no_recent_posts }}</p>
+        <br>
+    {% endif %}
+    
+    {% if has_more_posts %}
+    <div class="mdui-prose">
+        <a href="/posts{% if is_static %}.html{% endif %}">{{ i18n.view_more }}</a>
+        <br><br>
+    </div>
     {% endif %}
 {% endblock %}

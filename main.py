@@ -59,7 +59,7 @@ async def favicon():
 
 @app.get("/")
 async def mainpage():
-    return renderer.render("index.html", recent_posts=posts_manager.recent_posts())
+    return renderer.render("index.html", recent_posts=posts_manager.recent_posts(), has_more_posts=len(posts_manager.posts) > 5)
 
 
 @app.get("/feed")
