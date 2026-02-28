@@ -1,5 +1,5 @@
 from typing import Literal, Optional
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, Response
 from utils import (
@@ -76,6 +76,12 @@ async def sitemap_view():
         media_type="application/xml; charset=utf-8",
     )
 
+@app.get("/post/{slug}.md")
+async def view_original_markdown(slug: str):
+    post = posts_manager.posts.get(slug)
+    if post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
+    return Response(content=post.original_content, media_type="text/markdown")
 
 @app.get("/post/{slug}")
 async def view_post(slug: str):

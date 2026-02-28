@@ -69,6 +69,7 @@ class PostMetadata(BaseModel):
 class Post(BaseModel):
     metadata: PostMetadata
     content: str
+    original_content: str
     slug: str
 
 
@@ -301,16 +302,16 @@ class PostsManager:
         for filename in os.listdir(self.posts_dir):
             if filename.endswith(".md"):
                 with open(os.path.join(self.posts_dir, filename), "r") as f:
-                    content = f.read()
+                    file_content = f.read()
                 try:
-                    metadata, content = parse_post(filename, content)
+                    metadata, content = parse_post(filename, file_content)
                 except Exception as e:
                     logger.error(f"Error parsing post {filename}, ignoring: {e}")
                     continue
                 if not metadata.published:
                     continue
                 slug = ".".join(filename.split(".")[:-1])
-                self.posts[slug] = Post(metadata=metadata, content=content, slug=slug)
+                self.posts[slug] = Post(metadata=metadata, content=content, slug=slug, original_content=file_content)
         end_time = time.time()
         logger.info(
             f"Loaded {len(self.posts)} posts in {(end_time - start_time)*1000:.4f}ms"
