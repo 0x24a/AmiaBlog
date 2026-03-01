@@ -28,3 +28,5 @@ build_time_usage: 48.19ms
 ## Limitations
 - Search functionality will be disabled. (Will be implemented in the future)
 - The option to select the sort order in the "All Posts" page will be disabled.
+
+[← Back to README](../README.md)
