@@ -1,4 +1,4 @@
-name: Python / Code Format (black)
+name: Code Style
 
 on:
   push:
