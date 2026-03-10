@@ -15,3 +15,9 @@ dependencies = [
     "pyyaml>=6.0.3",
     "uvicorn>=0.40.0",
 ]
+
+[dependency-groups]
+dev = [
+    "black>=26.3.0",
+    "pyright>=1.1.408",
+]
