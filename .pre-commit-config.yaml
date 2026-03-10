@@ -2,8 +2,8 @@ repos:
   - repo: local
     hooks:
       - id: black-format
-        name: black .
-        entry: uv run black . --target-version py311
+        name: black . --check
+        entry: uv run black . --check --target-version py311
         language: system
         pass_filenames: false
 
