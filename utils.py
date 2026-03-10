@@ -37,7 +37,7 @@ class CopyrightSettings(BaseModel):
 
 class ICPSettings(BaseModel):
     description: str
-    link: str
+    url: str
 
 
 class FriendLinkItem(BaseModel):
