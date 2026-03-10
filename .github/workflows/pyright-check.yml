@@ -1,0 +1,27 @@
+name: Python / Type Checking (pyright)
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  pyright:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Check types with Pyright
+        run: uv run pyright
