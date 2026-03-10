@@ -75,10 +75,15 @@
                 <p>{{ i18n.copyright.format(copyright.name) }}&nbsp;<a href="{{ copyright.refer }}" target="_blank">{{ i18n.copyright_refer }}</a></p>
             </div>
           <br>
-          <br>
           {% endif %}
           {% endblock %}
       </div>
+      
+      {% if config.icp %}
+      <div style="text-align: center;" class="mdui-prose"><a href="{{ config.icp.link }}" target="_blank">{{ config.icp.description }}</a></div>
+      <br>
+      {% endif %}
+      <br>
 
       <mdui-dialog id="about" close-on-esc close-on-overlay-click style="text-align: center;">
             <p style="font-size: x-large;">{{ config.site_settings.title }}</p>

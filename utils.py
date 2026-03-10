@@ -35,6 +35,11 @@ class CopyrightSettings(BaseModel):
     refer: str
 
 
+class ICPSettings(BaseModel):
+    description: str
+    link: str
+
+
 class FriendLinkItem(BaseModel):
     name: str
     url: str
@@ -48,6 +53,7 @@ class Config(BaseModel):
     search_method: Literal["fullmatch", "jieba"] = "fullmatch"
     cloudflare_analytics_token: Optional[str] = None
     friend_links: Optional[List[FriendLinkItem]] = None
+    icp: Optional[ICPSettings] = None
 
     # Debug flags
     disable_template_cache: bool = False
