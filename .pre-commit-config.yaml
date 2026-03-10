@@ -1,0 +1,14 @@
+repos:
+  - repo: local
+    hooks:
+      - id: black-format
+        name: black .
+        entry: uv run black . --target-version py311
+        language: system
+        pass_filenames: false
+
+      - id: pyright
+        name: pyright
+        entry: uv run pyright
+        language: system
+        pass_filenames: false

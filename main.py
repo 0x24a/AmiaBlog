@@ -11,7 +11,7 @@ from utils import (
     I18nProvider,
     HLJSLanguageManager,
     RSSProvider,
-    SitemapProvider
+    SitemapProvider,
 )
 import time
 
@@ -22,13 +22,13 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/attachments", StaticFiles(directory="attachments"), name="attachments")
 
 config = load_config()
-hljs_manager = HLJSLanguageManager(languages = config.site_settings.hljs_languages)
+hljs_manager = HLJSLanguageManager(languages=config.site_settings.hljs_languages)
 posts_manager = PostsManager(
     search_method=config.search_method,
     hot_reload=config.hot_reload,
     hot_reload_interval=config.hot_reload_interval,
 )
-i18n = I18nProvider(language = config.site_language)
+i18n = I18nProvider(language=config.site_language)
 renderer = TemplateRenderer(
     disable_cache=config.disable_template_cache,
     static_params={
@@ -40,14 +40,9 @@ renderer = TemplateRenderer(
         "copyright": config.copyright,
     },
 )
-rss_provider = RSSProvider(
-    config=config,
-    posts_manager=posts_manager
-)
+rss_provider = RSSProvider(config=config, posts_manager=posts_manager)
 sitemap_provider = SitemapProvider(
-    config=config,
-    posts_manager=posts_manager,
-    is_static=False
+    config=config, posts_manager=posts_manager, is_static=False
 )
 sitemap = sitemap_provider.generate_sitemap()
 
@@ -59,7 +54,11 @@ async def favicon():
 
 @app.get("/")
 async def mainpage():
-    return renderer.render("index.html", recent_posts=posts_manager.recent_posts(), has_more_posts=len(posts_manager.posts) > 5)
+    return renderer.render(
+        "index.html",
+        recent_posts=posts_manager.recent_posts(),
+        has_more_posts=len(posts_manager.posts) > 5,
+    )
 
 
 @app.get("/feed")
@@ -69,6 +68,7 @@ async def rss():
         media_type="application/rss+xml; charset=utf-8",
     )
 
+
 @app.get("/sitemap.xml")
 async def sitemap_view():
     return Response(
@@ -76,12 +76,14 @@ async def sitemap_view():
         media_type="application/xml; charset=utf-8",
     )
 
+
 @app.get("/post/{slug}.md")
 async def view_original_markdown(slug: str):
     post = posts_manager.posts.get(slug)
     if post is None:
         raise HTTPException(status_code=404, detail="Post not found")
     return Response(content=post.original_content, media_type="text/markdown")
+
 
 @app.get("/post/{slug}")
 async def view_post(slug: str):
@@ -99,7 +101,7 @@ async def view_post(slug: str):
 
 @app.get("/posts")
 async def view_posts(
-    order: Optional[Literal["date", "date_desc", "modified", "modified_desc"]] = None
+    order: Optional[Literal["date", "date_desc", "modified", "modified_desc"]] = None,
 ):
     if not order:
         order = "modified_desc"

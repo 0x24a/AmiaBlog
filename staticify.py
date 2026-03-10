@@ -9,7 +9,7 @@ from utils import (
     I18nProvider,
     HLJSLanguageManager,
     RSSProvider,
-    SitemapProvider
+    SitemapProvider,
 )
 import os
 import time
@@ -49,13 +49,10 @@ class AmiaBlogStaticGenerator:
             },
         )
         self.rss_provider = RSSProvider(
-            config=self.config,
-            posts_manager=self.posts_manager
+            config=self.config, posts_manager=self.posts_manager
         )
         self.sitemap_provider = SitemapProvider(
-            config=self.config,
-            posts_manager=self.posts_manager,
-            is_static=True
+            config=self.config, posts_manager=self.posts_manager, is_static=True
         )
 
     def init_dist_dir(self):

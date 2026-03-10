@@ -129,31 +129,31 @@ class TemplateRenderer:
 def parse_post(filename: str, content: str) -> Tuple[PostMetadata, str]:
     """
     Parses a post from its content.
-    
+
     Supports both formats:
     - Standard YAML front matter: content starting with "---", metadata, then "---"
     - Legacy format: metadata without delimiters at the start
-    
+
     Args:
         filename (str): The filename of the post.
         content (str): The content of the post.
-        
+
     Returns:
         Tuple[PostMetadata, str]: A tuple containing the metadata and the rest content of the post in markdown.
     """
     lines = content.split("\n")
-    
+
     if lines and lines[0].strip() == "---":
         metadata_lines = []
         content_start_idx = None
-        
+
         # Find the closing "---"
         for i, line in enumerate(lines[1:], start=1):
             if line.strip() == "---":
                 content_start_idx = i + 1
                 break
             metadata_lines.append(line)
-        
+
         if content_start_idx is None:
             logger.warning(
                 f"Post '{filename}' starts with '---' but no closing delimiter found. "
@@ -161,20 +161,20 @@ def parse_post(filename: str, content: str) -> Tuple[PostMetadata, str]:
                 "---\\nmetadata\\n---\\ncontent"
             )
             return _parse_legacy_format(content)
-        
+
         metadata = yaml.safe_load("\n".join(metadata_lines))
         content_lines = lines[content_start_idx:]
-        
+
     else:
         logger.warning(
             f"Post '{filename}' uses legacy format without YAML frontmatter delimiters. "
             "Please migrate to standard format: ---\\nmetadata\\n---\\ncontent"
         )
         return _parse_legacy_format(content)
-    
+
     if isinstance(metadata.get("tags"), list):
         metadata["tags"] = [str(tag) for tag in metadata["tags"]]
-    
+
     metadata = PostMetadata.model_validate(metadata)
     return metadata, "\n".join(content_lines)
 
@@ -182,10 +182,10 @@ def parse_post(filename: str, content: str) -> Tuple[PostMetadata, str]:
 def _parse_legacy_format(content: str) -> Tuple[PostMetadata, str]:
     """
     Parses post in legacy format (metadata without delimiters).
-    
+
     Args:
         content (str): The content of the post.
-        
+
     Returns:
         Tuple[PostMetadata, str]: A tuple containing the metadata and the rest content.
     """
@@ -231,10 +231,11 @@ def get_platform_string():
 
     return f"{final_os}-{final_arch}-none"
 
+
 def get_commit_hash(length: int = 7) -> Optional[str]:
     try:
         commit_hash = os.popen("git rev-parse HEAD").read().strip()
-        assert all([ char in "0123456789abcedf" for char in commit_hash])
+        assert all([char in "0123456789abcedf" for char in commit_hash])
         return commit_hash[:length] if length != 0 else commit_hash
     except Exception:
         return None
@@ -311,7 +312,12 @@ class PostsManager:
                 if not metadata.published:
                     continue
                 slug = ".".join(filename.split(".")[:-1])
-                self.posts[slug] = Post(metadata=metadata, content=content, slug=slug, original_content=file_content)
+                self.posts[slug] = Post(
+                    metadata=metadata,
+                    content=content,
+                    slug=slug,
+                    original_content=file_content,
+                )
         end_time = time.time()
         logger.info(
             f"Loaded {len(self.posts)} posts in {(end_time - start_time)*1000:.4f}ms"
@@ -608,6 +614,7 @@ class RSSProvider:
 
         return "\n".join(rss_parts)
 
+
 class SitemapProvider:
     def __init__(self, posts_manager: PostsManager, config: Config, is_static: bool):
         self.posts_manager = posts_manager
@@ -615,42 +622,68 @@ class SitemapProvider:
         self.is_static = is_static
 
     def generate_sitemap(self) -> str:
-        assert self.config.site_settings.site_url # actually not necessary
-        parts = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
-        
+        assert self.config.site_settings.site_url  # actually not necessary
+        parts = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+        ]
+
         parts.append("  <url>")
         parts.append("    <loc>{}</loc>".format(self.config.site_settings.site_url))
         parts.append("  </url>")
-        
-        top_level_pages = [
-            "posts",
-            "tags"
-        ]
+
+        top_level_pages = ["posts", "tags"]
         if not self.is_static:
             top_level_pages.append("search")
         if self.config.friend_links:
             top_level_pages.append("friend-links")
         for page in top_level_pages:
             parts.append("  <url>")
-            parts.append("    <loc>{}</loc>".format(self.config.site_settings.site_url + page + (".html" if self.is_static else "")))
+            parts.append(
+                "    <loc>{}</loc>".format(
+                    self.config.site_settings.site_url
+                    + page
+                    + (".html" if self.is_static else "")
+                )
+            )
             parts.append("  </url>")
-        
+
         for slug, post in self.posts_manager.posts.items():
             if not post.metadata.published:
                 continue
             parts.append("  <url>")
-            parts.append("    <loc>{}</loc>".format(self.config.site_settings.site_url + "post/" + slug + (".html" if self.is_static else "")))
-            parts.append("    <lastmod>{}</lastmod>".format(post.metadata.last_modified.strftime("%Y-%m-%d")))
+            parts.append(
+                "    <loc>{}</loc>".format(
+                    self.config.site_settings.site_url
+                    + "post/"
+                    + slug
+                    + (".html" if self.is_static else "")
+                )
+            )
+            parts.append(
+                "    <lastmod>{}</lastmod>".format(
+                    post.metadata.last_modified.strftime("%Y-%m-%d")
+                )
+            )
             parts.append("  </url>")
-        
+
         for name, _ in self.posts_manager.tags.items():
             posts = self.posts_manager.get_posts_by_tag(name)
             last_modified = max(post.metadata.last_modified for post in posts)
             parts.append("  <url>")
-            parts.append("    <loc>{}</loc>".format(self.config.site_settings.site_url + "tag/" + name + (".html" if self.is_static else "")))
-            parts.append("    <lastmod>{}</lastmod>".format(last_modified.strftime("%Y-%m-%d")))
+            parts.append(
+                "    <loc>{}</loc>".format(
+                    self.config.site_settings.site_url
+                    + "tag/"
+                    + name
+                    + (".html" if self.is_static else "")
+                )
+            )
+            parts.append(
+                "    <lastmod>{}</lastmod>".format(last_modified.strftime("%Y-%m-%d"))
+            )
             parts.append("  </url>")
-        
+
         parts.append("</urlset>")
-        
+
         return "\n".join(parts)
