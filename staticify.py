@@ -141,6 +141,9 @@ class AmiaBlogStaticGenerator:
                             "post.html", post=post, hljs_languages=available_languages
                         )
                     )
+                logger.info(f"\tCopying: post/{slug}.md")
+                with open(os.path.join(self.destination, f"post/{slug}.md"), "w+") as f:
+                    f.write(post.original_content)
 
     def render_tags(self):
         tags = self.posts_manager.list_tags()
