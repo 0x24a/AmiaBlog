@@ -52,7 +52,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.mount("/static", StaticFiles(directory="static"), name="static")
-app.mount("/attachments", StaticFiles(directory="attachments"), name="attachments")
+app.mount("/attachments", StaticFiles(directory="data/attachments"), name="attachments")
 
 
 @app.get("/favicon.ico")

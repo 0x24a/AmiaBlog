@@ -250,7 +250,7 @@ def get_commit_hash(length: int = 7) -> Optional[str]:
 class PostsManager:
     def __init__(
         self,
-        posts_dir: str = "posts",
+        posts_dir: str = "data/posts",
         search_method: Literal["fullmatch", "jieba"] = "fullmatch",
         build_search_index: bool = False,
         hot_reload: bool = True,
