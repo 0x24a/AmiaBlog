@@ -280,6 +280,7 @@ class PostsManager:
         crypto = md5()
         for filename in os.listdir(self.posts_dir):
             if filename.endswith(".md"):
+                crypto.update(filename.encode())
                 with open(os.path.join(self.posts_dir, filename), "rb") as f:
                     crypto.update(f.read())
         return crypto.hexdigest()
