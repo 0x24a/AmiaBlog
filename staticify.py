@@ -75,7 +75,9 @@ class AmiaBlogStaticGenerator:
         os.remove(os.path.join(self.destination, "static", "favicon.ico"))
 
     def init_attachments(self):
-        shutil.copytree("attachments", os.path.join(self.destination, "attachments"))
+        shutil.copytree(
+            "data/attachments", os.path.join(self.destination, "attachments")
+        )
 
     def render_top_layers(self):
         logger.info("\tRendering: RSS Feed")
