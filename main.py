@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, Response
 from contextlib import asynccontextmanager
-from utils import (
+from core import (
     load_config,
     get_amiablog_version,
     get_commit_hash,

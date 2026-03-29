@@ -1,5 +1,5 @@
 import sys
-from utils import (
+from core import (
     load_config,
     get_amiablog_version,
     get_platform_string,
