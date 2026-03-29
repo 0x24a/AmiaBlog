@@ -6,6 +6,7 @@ from core.i18n import I18nProvider
 from core.hljs import HLJSLanguageManager
 from core.rss import RSSProvider
 from core.sitemap import SitemapProvider
+from core.utils import check_attachment_migration
 
 __all__ = [
     "load_config",
@@ -18,4 +19,5 @@ __all__ = [
     "PostsManager",
     "RSSProvider",
     "SitemapProvider",
+    "check_attachment_migration",
 ]

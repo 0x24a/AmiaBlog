@@ -7,6 +7,7 @@ from core import (
     load_config,
     get_amiablog_version,
     get_commit_hash,
+    check_attachment_migration,
     TemplateRenderer,
     PostsManager,
     I18nProvider,
@@ -17,6 +18,8 @@ from core import (
 import time
 
 __VERSION__ = get_amiablog_version()
+
+check_attachment_migration()
 
 config = load_config()
 hljs_manager = HLJSLanguageManager(languages=config.site_settings.hljs_languages)

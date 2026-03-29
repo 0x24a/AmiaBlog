@@ -6,6 +6,7 @@ import jieba_fast
 from typing import Callable, Dict, List, Literal, Optional, Tuple, Union
 from hashlib import md5
 
+from jieba_fast.finalseg import sys
 import yaml
 from loguru import logger
 from core.models import PostMetadata, Post, Tag
@@ -158,7 +159,18 @@ class PostsManager:
             self.search_index = None
         logger.info("Loading posts")
         start_time = time.time()
-        for filename in os.listdir(self.posts_dir):
+        try:
+            files = os.listdir(self.posts_dir)
+        except FileNotFoundError as _:
+            if self.posts_dir == "data/posts" and os.path.isdir("posts"):
+                logger.error(
+                    "...\nError: the default posts directory has been changed to data/posts (in commit 647887d).\nPlease do a migration."
+                )
+                sys.exit(1)
+            else:
+                raise
+
+        for filename in files:
             if filename.endswith(".md"):
                 with open(os.path.join(self.posts_dir, filename), "r") as f:
                     file_content = f.read()
