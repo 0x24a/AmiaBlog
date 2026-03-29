@@ -264,6 +264,7 @@ class PostsManager:
         self.search_method: Literal["fullmatch", "jieba"] = search_method
         self.hot_reload: bool = hot_reload
         self.hot_reload_interval: Union[int, float] = hot_reload_interval
+        self.reloading: bool = True
         if self.search_method == "jieba":
             logger.info("Initializing jieba predix dict")
             jieba_fast.initialize()
@@ -290,8 +291,13 @@ class PostsManager:
             f"Listening for changes every {self.hot_reload_interval} second(s)..."
         )
         last_signature = self.calculate_posts_signature()
-        while True:
-            time.sleep(self.hot_reload_interval)
+        last_reload_time = time.time()
+        while self.reloading:
+            time.sleep(
+                min(0.1, self.hot_reload_interval)
+            )  # Avoid not being interrupted by the flag
+            if (time.time() - last_reload_time) <= self.hot_reload_interval:
+                continue
             current_signature = self.calculate_posts_signature()
             if current_signature != last_signature:
                 logger.info("Post changes detected, reloading...")

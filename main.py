@@ -2,6 +2,7 @@ from typing import Literal, Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, Response
+from contextlib import asynccontextmanager
 from utils import (
     load_config,
     get_amiablog_version,
@@ -16,10 +17,6 @@ from utils import (
 import time
 
 __VERSION__ = get_amiablog_version()
-
-app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
-app.mount("/attachments", StaticFiles(directory="attachments"), name="attachments")
 
 config = load_config()
 hljs_manager = HLJSLanguageManager(languages=config.site_settings.hljs_languages)
@@ -45,6 +42,17 @@ sitemap_provider = SitemapProvider(
     config=config, posts_manager=posts_manager, is_static=False
 )
 sitemap = sitemap_provider.generate_sitemap()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    posts_manager.reloading = False
+
+
+app = FastAPI(lifespan=lifespan)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/attachments", StaticFiles(directory="attachments"), name="attachments")
 
 
 @app.get("/favicon.ico")
