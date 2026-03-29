@@ -43,6 +43,7 @@ class Config(BaseModel):
     disable_template_cache: bool = False
     hot_reload: bool = True
     hot_reload_interval: Union[int, float] = 5
+    live_preview: bool = False
 
 
 class PostMetadata(BaseModel):

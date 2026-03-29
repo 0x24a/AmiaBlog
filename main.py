@@ -1,8 +1,10 @@
+import threading
 from typing import Literal, Optional
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, WebSocket
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, Response
 from contextlib import asynccontextmanager
+from loguru import logger
 from core import (
     load_config,
     get_amiablog_version,
@@ -14,6 +16,7 @@ from core import (
     HLJSLanguageManager,
     RSSProvider,
     SitemapProvider,
+    LivePreviewManager,
 )
 import time
 
@@ -45,12 +48,17 @@ sitemap_provider = SitemapProvider(
     config=config, posts_manager=posts_manager, is_static=False
 )
 sitemap = sitemap_provider.generate_sitemap()
+live_preview_manager = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     yield
+    logger.info("Shutting down PostsManager reloading")
     posts_manager.reloading = False
+    if live_preview_manager:
+        logger.info("Shutting down LivePreviewManager")
+        live_preview_manager.running = False
 
 
 app = FastAPI(lifespan=lifespan)
@@ -186,3 +194,24 @@ async def view_friend_links():
 @app.get("/api/health")
 async def root():
     return {"status": "ok", "server": "AmiaBlog", "version": __VERSION__}
+
+
+if config.live_preview:
+    logger.info(
+        "Live preview enabled. Enabling hot reload and overwritting interval to 0.1s."
+    )
+    if not config.hot_reload:
+        posts_manager.reload_thread = threading.Thread(
+            target=posts_manager._reload_thread
+        )
+        posts_manager.reload_thread.start()
+        config.hot_reload = True
+    config.hot_reload_interval = 0.1
+
+    # yolo
+    live_preview_manager = LivePreviewManager(posts_manager=posts_manager)
+
+    @app.websocket("/api/live-preview-ws")
+    async def _(websocket: WebSocket):
+        assert live_preview_manager is not None
+        await live_preview_manager.router(websocket)

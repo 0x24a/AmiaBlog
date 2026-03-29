@@ -73,16 +73,30 @@
         elem.innerHTML = escapedStr;
         return elem.value;
     }
-    const md = window.markdownit({
-      html: true,
-      linkify: true,
-      typographer: true,
-      breaks: true
-    }).use(window.markdownitFootnote);
-    const result = md.render(unescapeHtml(mdui.$('#post-content')[0].innerHTML));
-    mdui.$('#markdown-render-result')[0].innerHTML=result;
+    function renderPage(){ 
+      const md = window.markdownit({
+        html: true,
+        linkify: true,
+        typographer: true,
+        breaks: true
+      }).use(window.markdownitFootnote);
+      const result = md.render(unescapeHtml(mdui.$('#post-content')[0].innerHTML));
+      mdui.$('#markdown-render-result')[0].innerHTML=result;
+    }
+    renderPage();
+    window._amiablog_renderPage = renderPage;
     </script>
     {% if hljs_languages %}
     <script>hljs.highlightAll();</script>
+    {% endif %}
+    {% if config.live_preview %}
+    <script>
+    window._amiablog_slug = "{{ post.slug }}"
+    window._amiablog_i18n_ctx = {
+      "live_preview_connection_failed": "{{ i18n.live_preview_connection_failed }}",
+      "live_preview_connection_failed_desc": "{{ i18n.live_preview_connection_failed_desc }}",
+    }
+    </script>
+    <script src="/static/live_preview.js"></script>
     {% endif %}
 {% endblock %}

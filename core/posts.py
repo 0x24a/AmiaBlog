@@ -111,6 +111,9 @@ class PostsManager:
         self.hot_reload: bool = hot_reload
         self.hot_reload_interval: Union[int, float] = hot_reload_interval
         self.reloading: bool = True
+        self._post_reload_hook: Optional[
+            Callable[[str, Optional[Post], Post], None]
+        ] = None
         if self.search_method == "jieba":
             logger.info("Initializing jieba predix dict")
             jieba_fast.initialize()
@@ -151,6 +154,9 @@ class PostsManager:
                 last_signature = current_signature
 
     def load_posts(self, build_search_index: bool = True) -> None:
+        posts_before = None
+        if self._post_reload_hook:
+            posts_before = {slug: post for slug, post in self.posts.items()}
         # Clear posts & db
         self.posts.clear()
         self.tags.clear()
@@ -204,6 +210,16 @@ class PostsManager:
             end_time = time.time()
             logger.info(f"Built search index in {(end_time - start_time)*1000:.4f}ms")
         logger.info("Finished loading posts")
+        if self._post_reload_hook:
+            # Yes! I know this is NOT graceful! But since it's a dev-environment-only feature,
+            #   and it just works, I don't see any problem.
+            logger.debug("Invoking post reload hook")
+            assert posts_before is not None
+            for slug, post in self.posts.items():
+                if slug not in posts_before:
+                    self._post_reload_hook(slug, None, post)
+                else:
+                    self._post_reload_hook(slug, posts_before[slug], post)
 
     def _build_tag_index(self):
         for post in self.posts.values():

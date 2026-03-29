@@ -47,5 +47,7 @@
   "error_invalid_query": "Query must be between 1 and 50 characters.",
   "error_post_not_found": "Post not found. There might be a typo in the URL or the post has been deleted.",
   "error_tag_not_found": "Tag not found. There might be a typo in the URL or the tag has been deleted.",
-  "error_page_not_found": "Page not found. There might be a typo in the URL or the page has been deleted."
+  "error_page_not_found": "Page not found. There might be a typo in the URL or the page has been deleted.",
+  "live_preview_connection_failed": "Failed to connect",
+  "live_preview_connection_failed_desc": "Failed to connect to live preview WebSocket. Automatically disabling."
 }
