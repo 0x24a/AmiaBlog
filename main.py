@@ -207,6 +207,7 @@ if config.live_preview:
         posts_manager.reload_thread.start()
         config.hot_reload = True
     config.hot_reload_interval = 0.1
+    posts_manager.hot_reload_interval = 0.1
 
     # yolo
     live_preview_manager = LivePreviewManager(posts_manager=posts_manager)
