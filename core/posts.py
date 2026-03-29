@@ -152,6 +152,7 @@ class PostsManager:
                 logger.info("Post changes detected, reloading...")
                 self.load_posts(self.build_search_index)
                 last_signature = current_signature
+                last_reload_time = time.time()
 
     def load_posts(self, build_search_index: bool = True) -> None:
         posts_before = None
