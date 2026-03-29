@@ -57,8 +57,8 @@ class Config(BaseModel):
 
     # Debug flags
     disable_template_cache: bool = False
-    hot_reload: bool = False
-    hot_reload_interval: Union[int, float] = 1
+    hot_reload: bool = True
+    hot_reload_interval: Union[int, float] = 5
 
 
 class PostMetadata(BaseModel):
