@@ -61,7 +61,7 @@ async def lifespan(app: FastAPI):
         live_preview_manager.running = False
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/attachments", StaticFiles(directory="data/attachments"), name="attachments")
 
