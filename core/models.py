@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Literal, Optional, Union
+from typing import List, Literal, Optional
 from pydantic import BaseModel
 from loguru import logger
 
@@ -41,8 +41,6 @@ class Config(BaseModel):
 
     # Debug flags
     disable_template_cache: bool = False
-    hot_reload: bool = True
-    hot_reload_interval: Union[int, float] = 5
     live_preview: bool = False
 
 

@@ -3,12 +3,14 @@ import sqlite3
 import threading
 import time
 import jieba_fast
-from typing import Callable, Dict, List, Literal, Optional, Tuple, Union
-from hashlib import md5
+from typing import Callable, Dict, List, Literal, Optional, Tuple
 
 from jieba_fast.finalseg import sys
 import yaml
 from loguru import logger
+from watchdog.observers import Observer
+from watchdog.observers.api import BaseObserver
+from watchdog.events import FileSystemEventHandler, FileSystemEvent
 from core.models import PostMetadata, Post, Tag
 
 
@@ -93,14 +95,49 @@ def _parse_legacy_format(content: str) -> Tuple[PostMetadata, str]:
     return metadata, "\n".join(content_lines)
 
 
+class PostsFileHandler(FileSystemEventHandler):
+    """Watchdog event handler for monitoring post file changes."""
+
+    DEBOUNCE_INTERVAL = 0.5  # seconds
+
+    def __init__(self, posts_manager: "PostsManager") -> None:
+        super().__init__()
+        self.posts_manager = posts_manager
+        self._debounce_timer: Optional[threading.Timer] = None
+        self._lock = threading.Lock()
+
+    def _schedule_reload(self):
+        """Debounce reload to avoid multiple reloads for batch changes."""
+        with self._lock:
+            if self._debounce_timer is not None:
+                self._debounce_timer.cancel()
+            self._debounce_timer = threading.Timer(
+                self.DEBOUNCE_INTERVAL, self._do_reload
+            )
+            self._debounce_timer.start()
+
+    def _do_reload(self):
+        """Perform the actual reload."""
+        logger.info("Post changes detected, reloading...")
+        self.posts_manager.load_posts(self.posts_manager.build_search_index)
+
+    def on_any_event(self, event: FileSystemEvent) -> None:
+        # Only handle .md files
+        if event.is_directory:
+            return
+        src_path = str(event.src_path)
+        if not src_path.endswith(".md"):
+            return
+        logger.debug(f"File event: {event.event_type} - {src_path}")
+        self._schedule_reload()
+
+
 class PostsManager:
     def __init__(
         self,
         posts_dir: str = "data/posts",
         search_method: Literal["fullmatch", "jieba"] = "fullmatch",
         build_search_index: bool = False,
-        hot_reload: bool = True,
-        hot_reload_interval: Union[int, float] = 1,
     ) -> None:
         self.posts_dir = posts_dir
         self.posts: Dict[str, Post] = {}
@@ -108,12 +145,10 @@ class PostsManager:
         self.build_search_index = build_search_index
         self.search_index: Optional[sqlite3.Connection] = None
         self.search_method: Literal["fullmatch", "jieba"] = search_method
-        self.hot_reload: bool = hot_reload
-        self.hot_reload_interval: Union[int, float] = hot_reload_interval
-        self.reloading: bool = True
         self._post_reload_hook: Optional[
             Callable[[str, Optional[Post], Post], None]
         ] = None
+        self._observer: Optional[BaseObserver] = None
         if self.search_method == "jieba":
             logger.info("Initializing jieba predix dict")
             jieba_fast.initialize()
@@ -122,37 +157,25 @@ class PostsManager:
         else:
             raise ValueError("Invalid search method.")
         self.load_posts(build_search_index)
-        if hot_reload:
-            self.reload_thread = threading.Thread(target=self._reload_thread)
-            self.reload_thread.start()
+        self._start_watchdog()
 
-    def calculate_posts_signature(self) -> str:
-        crypto = md5()
-        for filename in os.listdir(self.posts_dir):
-            if filename.endswith(".md"):
-                crypto.update(filename.encode())
-                with open(os.path.join(self.posts_dir, filename), "rb") as f:
-                    crypto.update(f.read())
-        return crypto.hexdigest()
+    def _start_watchdog(self):
+        """Start watchdog observer for file monitoring."""
+        logger.info(f"Starting watchdog observer for {self.posts_dir}")
+        observer = Observer()
+        handler = PostsFileHandler(self)
+        observer.schedule(handler, self.posts_dir, recursive=False)
+        observer.start()
+        self._observer = observer
+        logger.info("Watchdog observer started, listening for file changes...")
 
-    def _reload_thread(self):
-        logger.info(
-            f"Listening for changes every {self.hot_reload_interval} second(s)..."
-        )
-        last_signature = self.calculate_posts_signature()
-        last_reload_time = time.time()
-        while self.reloading:
-            time.sleep(
-                min(0.1, self.hot_reload_interval)
-            )  # Avoid not being interrupted by the flag
-            if (time.time() - last_reload_time) <= self.hot_reload_interval:
-                continue
-            current_signature = self.calculate_posts_signature()
-            if current_signature != last_signature:
-                logger.info("Post changes detected, reloading...")
-                self.load_posts(self.build_search_index)
-                last_signature = current_signature
-                last_reload_time = time.time()
+    def stop_watchdog(self):
+        """Stop the watchdog observer."""
+        if self._observer is not None:
+            logger.info("Stopping watchdog observer...")
+            self._observer.stop()
+            self._observer.join()
+            self._observer = None
 
     def load_posts(self, build_search_index: bool = True) -> None:
         posts_before = None

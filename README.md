@@ -43,6 +43,7 @@ AmiaBlog is a simple blog system that emphasizes simplicity, customization, and 
 - High-Performance Search: In-memory SQLite database for lightning-fast queries
 - Fuzzy Search: jieba-fast tokenizer for better fuzzy search results
 - Multiple Search Methods: Choose between `fullmatch` (exact, better performance) or `jieba` (tokenized, better accuracy) search
+- Auto Hot Reload: Automatically reloads posts when files change using watchdog file system events
 
 ### Customization
 - Single-File Configuration: All settings in one `config.json` file
@@ -56,6 +57,7 @@ AmiaBlog is a simple blog system that emphasizes simplicity, customization, and 
 - Jinja2: Flexible & safe templating system with template caching
 - UV: Blazing fast, reliable dependency management
 - Pydantic: Easy data validation
+- Watchdog: File system event monitoring for automatic hot reload
 
 ## Quick Start
 
@@ -135,6 +137,7 @@ Under the MIT License, see [LICENSE](LICENSE) for details.
 - [FastAPI](https://fastapi.tiangolo.com/)
 - [MDUIv2](https://www.mdui.org/)
 - [jieba-fast](https://github.com/deepcs233/jieba_fast)
+- [Watchdog](https://github.com/gorakhargosh/watchdog)
 
 ---
 

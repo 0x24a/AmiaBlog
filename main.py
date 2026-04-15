@@ -1,4 +1,3 @@
-import threading
 from typing import Literal, Optional
 from fastapi import FastAPI, HTTPException, WebSocket
 from fastapi.staticfiles import StaticFiles
@@ -28,8 +27,6 @@ config = load_config()
 hljs_manager = HLJSLanguageManager(languages=config.site_settings.hljs_languages)
 posts_manager = PostsManager(
     search_method=config.search_method,
-    hot_reload=config.hot_reload,
-    hot_reload_interval=config.hot_reload_interval,
 )
 i18n = I18nProvider(language=config.site_language)
 renderer = TemplateRenderer(
@@ -54,8 +51,8 @@ live_preview_manager = None
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     yield
-    logger.info("Shutting down PostsManager reloading")
-    posts_manager.reloading = False
+    logger.info("Shutting down PostsManager watchdog")
+    posts_manager.stop_watchdog()
     if live_preview_manager:
         logger.info("Shutting down LivePreviewManager")
         live_preview_manager.running = False
@@ -197,17 +194,7 @@ async def root():
 
 
 if config.live_preview:
-    logger.info(
-        "Live preview enabled. Enabling hot reload and overwritting interval to 0.1s."
-    )
-    if not config.hot_reload:
-        posts_manager.reload_thread = threading.Thread(
-            target=posts_manager._reload_thread
-        )
-        posts_manager.reload_thread.start()
-        config.hot_reload = True
-    config.hot_reload_interval = 0.1
-    posts_manager.hot_reload_interval = 0.1
+    logger.info("Live preview enabled.")
 
     # yolo
     live_preview_manager = LivePreviewManager(posts_manager=posts_manager)
