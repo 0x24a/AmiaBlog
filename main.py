@@ -45,7 +45,6 @@ rss_provider = RSSProvider(config=config, posts_manager=posts_manager)
 sitemap_provider = SitemapProvider(
     config=config, posts_manager=posts_manager, is_static=False
 )
-sitemap = sitemap_provider.generate_sitemap()
 live_preview_manager = None
 
 
@@ -89,7 +88,7 @@ async def rss():
 @app.get("/sitemap.xml")
 async def sitemap_view():
     return Response(
-        sitemap,
+        sitemap_provider.generate_sitemap(),
         media_type="application/xml; charset=utf-8",
     )
 
