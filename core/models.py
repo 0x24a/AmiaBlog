@@ -68,7 +68,7 @@ class Tag(BaseModel):
 
 
 def load_config(filename: str = "config.json") -> Config:
-    with open(filename, "r") as f:
+    with open(filename, "r", encoding="utf-8") as f:
         config = Config.model_validate_json(f.read())
     if config.site_settings.site_url is None:
         logger.warning(

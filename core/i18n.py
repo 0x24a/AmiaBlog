@@ -30,7 +30,7 @@ class I18nProvider:
         self.load_translations()
 
     def load_translations(self) -> None:
-        with open(f"languages/{self.language}.json", "r") as f:
+        with open(f"languages/{self.language}.json", "r", encoding="utf-8") as f:
             terms = json.load(f)
         self.translations = {key: I18nTerm(key, term) for key, term in terms.items()}
 

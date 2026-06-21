@@ -81,10 +81,10 @@ class AmiaBlogStaticGenerator:
 
     def render_top_layers(self):
         logger.info("\tRendering: RSS Feed")
-        with open(os.path.join(self.destination, "feed.xml"), "w+") as f:
+        with open(os.path.join(self.destination, "feed.xml"), "w+", encoding="utf-8") as f:
             f.write(self.rss_provider.generate_rss(is_static=True))
         logger.info("\tRendering: Sitemap")
-        with open(os.path.join(self.destination, "sitemap.xml"), "w+") as f:
+        with open(os.path.join(self.destination, "sitemap.xml"), "w+", encoding="utf-8") as f:
             f.write(self.sitemap_provider.generate_sitemap())
         logger.info("\tRendering: index.html")
         self.renderer.render_static(
@@ -136,7 +136,7 @@ class AmiaBlogStaticGenerator:
                     if i in self.hljs_manager.available_languages
                 ]
                 with open(
-                    os.path.join(self.destination, f"post/{slug}.html"), "w+"
+                    os.path.join(self.destination, f"post/{slug}.html"), "w+", encoding="utf-8"
                 ) as f:
                     f.write(
                         self.renderer.render_to_plain_text(
@@ -144,7 +144,7 @@ class AmiaBlogStaticGenerator:
                         )
                     )
                 logger.info(f"\tCopying: post/{slug}.md")
-                with open(os.path.join(self.destination, f"post/{slug}.md"), "w+") as f:
+                with open(os.path.join(self.destination, f"post/{slug}.md"), "w+", encoding="utf-8") as f:
                     f.write(post.original_content)
 
     def render_tags(self):
@@ -159,7 +159,7 @@ class AmiaBlogStaticGenerator:
                     self.posts_manager.get_posts_by_tag(tag.name), "modified_desc"
                 )
                 with open(
-                    os.path.join(self.destination, f"tag/{tag.name}.html"), "w+"
+                    os.path.join(self.destination, f"tag/{tag.name}.html"), "w+", encoding="utf-8"
                 ) as f:
                     f.write(
                         self.renderer.render_to_plain_text(
@@ -168,7 +168,7 @@ class AmiaBlogStaticGenerator:
                     )
 
     def write_build_info(self, build_time, build_time_usage):
-        with open(os.path.join(self.destination, "amiablog_build_info.txt"), "w+") as f:
+        with open(os.path.join(self.destination, "amiablog_build_info.txt"), "w+", encoding="utf-8") as f:
             f.write(
                 f"software: AmiaBlog\nversion: {__VERSION__}\ncommit: {get_commit_hash(0)}\npython_version: {sys.version}\nplatform: {get_platform_string()}\nbuild_time: {build_time}\nbuild_time_usage: {round(build_time_usage,2)}ms\n"
             )

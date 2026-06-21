@@ -36,6 +36,6 @@ class TemplateRenderer:
         return HTMLResponse(rendered_html, status_code=status_code)
 
     def render_static(self, destination: str, template_name: str, **context) -> str:
-        with open(destination, "w+") as f:
+        with open(destination, "w+", encoding="utf-8") as f:
             f.write(self.render_to_plain_text(template_name, **context))
         return destination
