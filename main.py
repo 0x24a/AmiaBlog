@@ -27,6 +27,7 @@ config = load_config()
 hljs_manager = HLJSLanguageManager(languages=config.site_settings.hljs_languages)
 posts_manager = PostsManager(
     search_method=config.search_method,
+    build_search_index=True,
 )
 i18n = I18nProvider(language=config.site_language)
 renderer = TemplateRenderer(
