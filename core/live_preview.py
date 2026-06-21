@@ -14,8 +14,10 @@ class LivePreviewManager:
         self.posts_manager._post_reload_hook = self._post_reload_hook
         self.subscriptions = {}
         self.running = True
+        self._loop: Optional[asyncio.AbstractEventLoop] = None
 
     async def router(self, websocket: WebSocket) -> None:
+        self._loop = asyncio.get_running_loop()
         await websocket.accept()
         try:
             while self.running:
@@ -46,17 +48,21 @@ class LivePreviewManager:
                     value.remove(websocket)
 
     def _post_reload_hook(self, slug: str, before: Optional[Post], after: Post) -> None:
+        if self._loop is None or self._loop.is_closed():
+            return
         if before is None or before.metadata != after.metadata:
             # Metadata changed, trigger refresh since they are rendered server-side
             for ws in self.subscriptions.get(slug, []):
-                asyncio.run(
-                    ws.send_json({"type": "refresh"})
-                )  # Not the best practice, but works for now
+                asyncio.run_coroutine_threadsafe(
+                    ws.send_json({"type": "refresh"}), self._loop
+                )
             return
 
         # Content changed, send markdown raw text
         for ws in self.subscriptions.get(slug, []):
-            asyncio.run(ws.send_json({"type": "update", "markdown": after.content}))
+            asyncio.run_coroutine_threadsafe(
+                ws.send_json({"type": "update", "markdown": after.content}), self._loop
+            )
 
     def _show_warning(self) -> None:
         logger.warning(
