@@ -56,19 +56,19 @@
     <p style="font-size: large;">{{ post.metadata.description }}</p>
     <br>
     {% for tag in post.metadata.tags %}
-    <mdui-chip href="/tag/{{ tag | urlencode }}{% if is_static %}.html{% endif %}" target="_blank">{{ tag }}</mdui-chip>&nbsp;
+    <mdui-chip href="/tag/{{ tag | urlencode }}{% if is_static %}.html{% endif %}" target="_blank" rel="noopener noreferrer">{{ tag }}</mdui-chip>&nbsp;
     {% endfor %}
     <p style="display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; color: rgb(var(--mdui-color-outline))">
       <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
-        <mdui-icon name="person"></mdui-icon> {{ post.metadata.author }}
+        <mdui-icon name="person" aria-hidden="true"></mdui-icon> {{ post.metadata.author }}
       </span>
       <span>|</span>
       <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
-        <mdui-icon name="calendar_month"></mdui-icon> {{ post.metadata.date }}
+        <mdui-icon name="calendar_month" aria-hidden="true"></mdui-icon> {{ post.metadata.date }}
       </span>
       <span>|</span>
       <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
-        <mdui-icon name="edit"></mdui-icon> {{ post.metadata.last_modified }}
+        <mdui-icon name="edit" aria-hidden="true"></mdui-icon> {{ post.metadata.last_modified }}
       </span>
     </p>
     <br>

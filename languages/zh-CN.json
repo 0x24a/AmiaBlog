@@ -49,5 +49,6 @@
   "error_tag_not_found": "未找到标签。可能是因为 URL 键入错误或标签已被移除。",
   "error_page_not_found": "未找到页面。可能是因为 URL 键入错误或页面已被移除。",
   "live_preview_connection_failed": "连接失败",
-  "live_preview_connection_failed_desc": "无法连接到实时预览 WebSocket 服务。自动禁用中。"
+  "live_preview_connection_failed_desc": "无法连接到实时预览 WebSocket 服务。自动禁用中。",
+  "back_to_home": "返回首页"
 }

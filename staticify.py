@@ -46,6 +46,7 @@ class AmiaBlogStaticGenerator:
                 "copyright": self.config.copyright,
                 "commit_hash": get_commit_hash(),
                 "is_static": True,
+                "copyright_year": time.strftime("%Y"),
             },
         )
         self.rss_provider = RSSProvider(
@@ -120,6 +121,7 @@ class AmiaBlogStaticGenerator:
             os.path.join(self.destination, "404.html"),
             "error.html",
             error=self.i18n.error_page_not_found,
+            http_status_code=404,
         )
 
     def render_posts(self):

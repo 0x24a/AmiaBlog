@@ -14,12 +14,11 @@
     <!-- End Cloudflare Web Analytics -->
     {% endif %}
     <link rel="stylesheet" href="/static/mdui_2.1.4/mdui.css">
+    <link rel="stylesheet" href="/static/roboto/roboto.css">
     <style>
     body {
       font-family: 'Roboto', sans-serif;
     }
-
-    @import url('/static/roboto/roboto.css');
     </style>
     <script src="/static/mdui_2.1.4/mdui.global.js"></script>
     <link rel="stylesheet" href="/static/material_icons/material_icons.css">
@@ -73,7 +72,7 @@
             <mdui-divider></mdui-divider>
             <br>
             <div class="mdui-prose">
-                <p>{{ i18n.copyright.format(copyright.name) }}&nbsp;<a href="{{ copyright.refer }}" target="_blank">{{ i18n.copyright_refer }}</a></p>
+                <p>{{ i18n.copyright.format(copyright.name) }}&nbsp;<a href="{{ copyright.refer }}" target="_blank" rel="noopener noreferrer">{{ i18n.copyright_refer }}</a></p>
             </div>
           <br>
           {% endif %}
@@ -81,7 +80,7 @@
       </div>
       
       {% if config.icp %}
-      <div style="text-align: center;" class="mdui-prose"><a href="{{ config.icp.url }}" target="_blank">{{ config.icp.description }}</a></div>
+      <div style="text-align: center;" class="mdui-prose"><a href="{{ config.icp.url }}" target="_blank" rel="noopener noreferrer">{{ config.icp.description }}</a></div>
       <br>
       {% endif %}
       <br>
@@ -99,7 +98,7 @@
             <span style="color: rgb(var(--mdui-color-outline)); font-size: small;">{{ i18n.powered_by_commit.format(commit_hash) }}</span><br>
             {% endif %}
             <br>{{ i18n.powered_by_desc }}
-            <div class="mdui-prose"><a href="https://github.com/0x24a/AmiaBlog" target="_blank">{{ i18n.github_repo }}</a></div>
+            <div class="mdui-prose"><a href="https://github.com/0x24a/AmiaBlog" target="_blank" rel="noopener noreferrer">{{ i18n.github_repo }}</a></div>
             {% if is_static %}
                 <br>{{ i18n.static_build_time.format(static_build_time) }}
             {% endif %}

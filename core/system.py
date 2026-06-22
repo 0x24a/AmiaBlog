@@ -3,7 +3,7 @@ from typing import Optional
 import os
 
 
-def get_amiablog_version():
+def get_amiablog_version() -> Optional[str]:
     with open("pyproject.toml", "r", encoding="utf-8") as f:
         content = f.read()
         for line in content.split("\n"):

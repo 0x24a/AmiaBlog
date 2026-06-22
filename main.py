@@ -2,6 +2,7 @@ from typing import Literal, Optional
 from fastapi import FastAPI, HTTPException, WebSocket
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, Response
+from starlette.types import Scope
 from contextlib import asynccontextmanager
 from loguru import logger
 from core import (
@@ -59,8 +60,18 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None)
-app.mount("/static", StaticFiles(directory="static"), name="static")
-app.mount("/attachments", StaticFiles(directory="data/attachments"), name="attachments")
+
+
+class CachedStaticFiles(StaticFiles):
+    async def get_response(self, path: str, scope: Scope) -> Response:
+        response = await super().get_response(path, scope)
+        if response.status_code == 200:
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        return response
+
+
+app.mount("/static", CachedStaticFiles(directory="static"), name="static")
+app.mount("/attachments", CachedStaticFiles(directory="data/attachments"), name="attachments")
 
 
 @app.get("/favicon.ico")
@@ -106,7 +117,7 @@ async def view_post(slug: str):
     post = posts_manager.posts.get(slug)
     if post is None:
         return renderer.render(
-            "error.html", status_code=404, error=i18n.error_post_not_found
+            "error.html", status_code=404, error=i18n.error_post_not_found, http_status_code=404
         )
     hljs_languages = hljs_manager.get_markdown_languages(post.content)
     available_languages = [
@@ -130,7 +141,7 @@ async def view_tag(tag: str):
     posts = posts_manager.order_by(posts_manager.get_posts_by_tag(tag), "modified_desc")
     if len(posts) == 0:
         return renderer.render(
-            "error.html", status_code=404, error=i18n.error_tag_not_found
+            "error.html", status_code=404, error=i18n.error_tag_not_found, http_status_code=404
         )
     return renderer.render("tag.html", posts=posts, tag=tag)
 
@@ -156,12 +167,12 @@ async def view_search(
         )
     if order == "relevance" and config.search_method == "fullmatch":
         return renderer.render(
-            "error.html", status_code=400, error=i18n.error_relevance_in_fullmatch
+            "error.html", status_code=400, error=i18n.error_relevance_in_fullmatch, http_status_code=400
         )
     query = query.strip()
     if len(query) < 1 or len(query) > 50:
         return renderer.render(
-            "error.html", status_code=400, error=i18n.error_invalid_query
+            "error.html", status_code=400, error=i18n.error_invalid_query, http_status_code=400
         )
     start_time = time.time()
     search_results = posts_manager.search(query)
@@ -183,7 +194,7 @@ async def view_search(
 async def view_friend_links():
     if not config.friend_links:
         return renderer.render(
-            "error.html", status_code=404, error=i18n.error_not_found
+            "error.html", status_code=404, error=i18n.error_not_found, http_status_code=404
         )
     return renderer.render("friend_links.html", friend_links=config.friend_links)
 

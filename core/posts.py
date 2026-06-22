@@ -271,6 +271,7 @@ class PostsManager:
                 ),
             )
         db.commit()
+        cursor.close()
         self.search_index = db
 
     def list_tags(
