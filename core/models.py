@@ -38,6 +38,7 @@ class Config(BaseModel):
     cloudflare_analytics_token: Optional[str] = None
     friend_links: Optional[List[FriendLinkItem]] = None
     icp: Optional[ICPSettings] = None
+    footer_text: Optional[str] = None
 
     # Debug flags
     disable_template_cache: bool = False
@@ -53,6 +54,8 @@ class PostMetadata(BaseModel):
     published: bool
     author: str
     keywords: list[str] = []
+    copyright: Optional[CopyrightSettings] = None
+    declarations: Optional[List[str]] = []
 
 
 class Post(BaseModel):
@@ -68,7 +71,7 @@ class Tag(BaseModel):
 
 
 def load_config(filename: str = "config.json") -> Config:
-    with open(filename, "r") as f:
+    with open(filename, "r", encoding="utf-8") as f:
         config = Config.model_validate_json(f.read())
     if config.site_settings.site_url is None:
         logger.warning(

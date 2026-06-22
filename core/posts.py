@@ -5,7 +5,7 @@ import time
 import jieba_fast
 from typing import Callable, Dict, List, Literal, Optional, Tuple
 
-from jieba_fast.finalseg import sys
+import sys
 import yaml
 from loguru import logger
 from watchdog.observers import Observer
@@ -202,7 +202,7 @@ class PostsManager:
 
         for filename in files:
             if filename.endswith(".md"):
-                with open(os.path.join(self.posts_dir, filename), "r") as f:
+                with open(os.path.join(self.posts_dir, filename), "r", encoding="utf-8") as f:
                     file_content = f.read()
                 try:
                     metadata, content = parse_post(filename, file_content)
@@ -271,6 +271,7 @@ class PostsManager:
                 ),
             )
         db.commit()
+        cursor.close()
         self.search_index = db
 
     def list_tags(

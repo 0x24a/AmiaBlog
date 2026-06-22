@@ -2,6 +2,7 @@ from typing import Literal, Optional
 from fastapi import FastAPI, HTTPException, WebSocket
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, Response
+from starlette.types import Scope
 from contextlib import asynccontextmanager
 from loguru import logger
 from core import (
@@ -27,6 +28,7 @@ config = load_config()
 hljs_manager = HLJSLanguageManager(languages=config.site_settings.hljs_languages)
 posts_manager = PostsManager(
     search_method=config.search_method,
+    build_search_index=True,
 )
 i18n = I18nProvider(language=config.site_language)
 renderer = TemplateRenderer(
@@ -37,14 +39,13 @@ renderer = TemplateRenderer(
         "backend_version": __VERSION__,
         "commit_hash": get_commit_hash(),
         "total_posts": len(posts_manager.posts),
-        "copyright": config.copyright,
+        "copyright_year": time.strftime("%Y"),
     },
 )
 rss_provider = RSSProvider(config=config, posts_manager=posts_manager)
 sitemap_provider = SitemapProvider(
     config=config, posts_manager=posts_manager, is_static=False
 )
-sitemap = sitemap_provider.generate_sitemap()
 live_preview_manager = None
 
 
@@ -58,9 +59,17 @@ async def lifespan(app: FastAPI):
         live_preview_manager.running = False
 
 
+class CachedStaticFiles(StaticFiles):
+    async def get_response(self, path: str, scope: Scope) -> Response:
+        response = await super().get_response(path, scope)
+        if response.status_code == 200:
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        return response
+
+
 app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None)
-app.mount("/static", StaticFiles(directory="static"), name="static")
-app.mount("/attachments", StaticFiles(directory="data/attachments"), name="attachments")
+app.mount("/static", CachedStaticFiles(directory="static"), name="static")
+app.mount("/attachments", CachedStaticFiles(directory="data/attachments"), name="attachments")
 
 
 @app.get("/favicon.ico")
@@ -88,7 +97,7 @@ async def rss():
 @app.get("/sitemap.xml")
 async def sitemap_view():
     return Response(
-        sitemap,
+        sitemap_provider.generate_sitemap(),
         media_type="application/xml; charset=utf-8",
     )
 
@@ -106,7 +115,7 @@ async def view_post(slug: str):
     post = posts_manager.posts.get(slug)
     if post is None:
         return renderer.render(
-            "error.html", status_code=404, error=i18n.error_post_not_found
+            "error.html", status_code=404, error=i18n.error_post_not_found, http_status_code=404
         )
     hljs_languages = hljs_manager.get_markdown_languages(post.content)
     available_languages = [
@@ -130,7 +139,7 @@ async def view_tag(tag: str):
     posts = posts_manager.order_by(posts_manager.get_posts_by_tag(tag), "modified_desc")
     if len(posts) == 0:
         return renderer.render(
-            "error.html", status_code=404, error=i18n.error_tag_not_found
+            "error.html", status_code=404, error=i18n.error_tag_not_found, http_status_code=404
         )
     return renderer.render("tag.html", posts=posts, tag=tag)
 
@@ -156,12 +165,12 @@ async def view_search(
         )
     if order == "relevance" and config.search_method == "fullmatch":
         return renderer.render(
-            "error.html", status_code=400, error=i18n.error_relevance_in_fullmatch
+            "error.html", status_code=400, error=i18n.error_relevance_in_fullmatch, http_status_code=400
         )
     query = query.strip()
     if len(query) < 1 or len(query) > 50:
         return renderer.render(
-            "error.html", status_code=400, error=i18n.error_invalid_query
+            "error.html", status_code=400, error=i18n.error_invalid_query, http_status_code=400
         )
     start_time = time.time()
     search_results = posts_manager.search(query)
@@ -183,7 +192,7 @@ async def view_search(
 async def view_friend_links():
     if not config.friend_links:
         return renderer.render(
-            "error.html", status_code=404, error=i18n.error_not_found
+            "error.html", status_code=404, error=i18n.error_not_found, http_status_code=404
         )
     return renderer.render("friend_links.html", friend_links=config.friend_links)
 

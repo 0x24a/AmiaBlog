@@ -6,14 +6,16 @@
 
 {% block content %}
     <p style="font-size: x-large;">{{ i18n.error_occured }}</p>
+    <p style="font-size: xx-large; font-weight: bold; color: rgb(var(--mdui-color-error));">{{ http_status_code }}</p>
     <p>{{ i18n.error_desc.format(error) }}</p>
     <br>
     <mdui-divider></mdui-divider>
     <br>
-    <div style="display: flex; align-items: center; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 1rem;">
         <span style="display: inline-flex; align-items: center; gap: 0.8rem;">
             <mdui-circular-progress max="1" min="0" value="1" style="width: 1.5em; height: 1.5em;" id="progress"></mdui-circular-progress> <span id="countdown"></span>
         </span>
+        <mdui-button variant="outlined" href="/">{{ i18n.back_to_home }}</mdui-button>
     </div>
     <br>
 {% endblock %}

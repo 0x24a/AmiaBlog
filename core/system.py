@@ -3,8 +3,8 @@ from typing import Optional
 import os
 
 
-def get_amiablog_version():
-    with open("pyproject.toml", "r") as f:
+def get_amiablog_version() -> Optional[str]:
+    with open("pyproject.toml", "r", encoding="utf-8") as f:
         content = f.read()
         for line in content.split("\n"):
             if line.startswith("version"):
@@ -31,7 +31,9 @@ def get_platform_string():
 def get_commit_hash(length: int = 7) -> Optional[str]:
     try:
         commit_hash = os.popen("git rev-parse HEAD").read().strip()
-        assert all([char in "0123456789abcedf" for char in commit_hash])
+        if not commit_hash:
+            return None
+        assert all([char in "0123456789abcdef" for char in commit_hash])
         return commit_hash[:length] if length != 0 else commit_hash
     except Exception:
         return None

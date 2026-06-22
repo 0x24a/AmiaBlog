@@ -56,28 +56,49 @@
     <p style="font-size: large;">{{ post.metadata.description }}</p>
     <br>
     {% for tag in post.metadata.tags %}
-    <mdui-chip href="/tag/{{ tag | urlencode }}{% if is_static %}.html{% endif %}" target="_blank">{{ tag }}</mdui-chip>&nbsp;
+    <mdui-chip href="/tag/{{ tag | urlencode }}{% if is_static %}.html{% endif %}" target="_blank" rel="noopener noreferrer">{{ tag }}</mdui-chip>&nbsp;
     {% endfor %}
     <p style="display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; color: rgb(var(--mdui-color-outline))">
       <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
-        <mdui-icon name="person"></mdui-icon> {{ post.metadata.author }}
+        <mdui-icon name="person" aria-hidden="true"></mdui-icon> {{ post.metadata.author }}
       </span>
       <span>|</span>
       <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
-        <mdui-icon name="calendar_month"></mdui-icon> {{ post.metadata.date }}
+        <mdui-icon name="calendar_month" aria-hidden="true"></mdui-icon> {{ post.metadata.date }}
       </span>
       <span>|</span>
       <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
-        <mdui-icon name="edit"></mdui-icon> {{ post.metadata.last_modified }}
+        <mdui-icon name="edit" aria-hidden="true"></mdui-icon> {{ post.metadata.last_modified }}
       </span>
     </p>
     <br>
     <mdui-divider></mdui-divider>
     <br>
-    <br>
+    {% set declarations = post.metadata.declarations or [] %}
+    {% if declarations %}
+    <mdui-card variant="elevated" style="padding: 0.75rem 1rem; margin-bottom: 1rem;">
+        <div class="mdui-prose">
+            {% for d in declarations %}
+            <p style="color: rgb(var(--mdui-color-outline)); font-size: small; margin: 0.25rem 0;">{{ d }}</p>
+            {% endfor %}
+        </div>
+    </mdui-card>
+    {% endif %}
     <div id="markdown-render-result" class="mdui-prose">Rendering...</div>
     <br>
     <pre style="display: none;" id="post-content">{{ post.content }}</pre>
+{% endblock %}
+
+{% block copyright %}
+    {% set copyright_meta = post.metadata.copyright or config.copyright %}
+    {% if copyright_meta %}
+    <br>
+    <mdui-divider></mdui-divider>
+    <br>
+    <div class="mdui-prose">
+        <p style="color: rgb(var(--mdui-color-outline)); font-size: small; margin: 0;">{{ i18n.copyright.format(copyright_meta.name) }}&nbsp;<a href="{{ copyright_meta.refer }}" target="_blank" rel="noopener noreferrer">{{ i18n.copyright_refer }}</a></p>
+    </div>
+    {% endif %}
 {% endblock %}
 
 {% block extra_scripts %}
@@ -109,6 +130,7 @@
     window._amiablog_i18n_ctx = {
       "live_preview_connection_failed": "{{ i18n.live_preview_connection_failed }}",
       "live_preview_connection_failed_desc": "{{ i18n.live_preview_connection_failed_desc }}",
+      "live_preview_subscribe_failed": "{{ i18n.live_preview_subscribe_failed }}",
     }
     </script>
     <script src="/static/live_preview.js"></script>

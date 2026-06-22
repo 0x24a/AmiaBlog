@@ -11,9 +11,7 @@
     <mdui-divider></mdui-divider>
     <br>
     {% for tag in tags %}
-        <mdui-tooltip placement="bottom" content="{{ i18n.tag_post_count.format(tag.count) }}">
-            <mdui-chip href="/tag/{{ tag.name | urlencode }}{% if is_static %}.html{% endif %}">{{ tag.name }}</mdui-chip>
-        </mdui-tooltip>
+        <mdui-chip href="/tag/{{ tag.name | urlencode }}{% if is_static %}.html{% endif %}">{{ tag.name }}<mdui-badge slot="end" variant="small">{{ tag.count }}</mdui-badge></mdui-chip>
         &nbsp;
     {% endfor %}
     {% if not tags %}
