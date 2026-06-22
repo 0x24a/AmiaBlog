@@ -39,7 +39,7 @@ renderer = TemplateRenderer(
         "backend_version": __VERSION__,
         "commit_hash": get_commit_hash(),
         "total_posts": len(posts_manager.posts),
-        "copyright": config.copyright,
+        "copyright_year": time.strftime("%Y"),
     },
 )
 rss_provider = RSSProvider(config=config, posts_manager=posts_manager)
@@ -59,9 +59,6 @@ async def lifespan(app: FastAPI):
         live_preview_manager.running = False
 
 
-app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None)
-
-
 class CachedStaticFiles(StaticFiles):
     async def get_response(self, path: str, scope: Scope) -> Response:
         response = await super().get_response(path, scope)
@@ -70,6 +67,7 @@ class CachedStaticFiles(StaticFiles):
         return response
 
 
+app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None)
 app.mount("/static", CachedStaticFiles(directory="static"), name="static")
 app.mount("/attachments", CachedStaticFiles(directory="data/attachments"), name="attachments")
 

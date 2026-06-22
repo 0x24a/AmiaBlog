@@ -38,6 +38,7 @@ class Config(BaseModel):
     cloudflare_analytics_token: Optional[str] = None
     friend_links: Optional[List[FriendLinkItem]] = None
     icp: Optional[ICPSettings] = None
+    footer_text: Optional[str] = None
 
     # Debug flags
     disable_template_cache: bool = False
@@ -53,6 +54,8 @@ class PostMetadata(BaseModel):
     published: bool
     author: str
     keywords: list[str] = []
+    copyright: Optional[CopyrightSettings] = None
+    declarations: Optional[List[str]] = []
 
 
 class Post(BaseModel):

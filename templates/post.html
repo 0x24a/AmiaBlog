@@ -74,10 +74,31 @@
     <br>
     <mdui-divider></mdui-divider>
     <br>
-    <br>
+    {% set declarations = post.metadata.declarations or [] %}
+    {% if declarations %}
+    <mdui-card variant="elevated" style="padding: 0.75rem 1rem; margin-bottom: 1rem;">
+        <div class="mdui-prose">
+            {% for d in declarations %}
+            <p style="color: rgb(var(--mdui-color-outline)); font-size: small; margin: 0.25rem 0;">{{ d }}</p>
+            {% endfor %}
+        </div>
+    </mdui-card>
+    {% endif %}
     <div id="markdown-render-result" class="mdui-prose">Rendering...</div>
     <br>
     <pre style="display: none;" id="post-content">{{ post.content }}</pre>
+{% endblock %}
+
+{% block copyright %}
+    {% set copyright_meta = post.metadata.copyright or config.copyright %}
+    {% if copyright_meta %}
+    <br>
+    <mdui-divider></mdui-divider>
+    <br>
+    <div class="mdui-prose">
+        <p style="color: rgb(var(--mdui-color-outline)); font-size: small; margin: 0;">{{ i18n.copyright.format(copyright_meta.name) }}&nbsp;<a href="{{ copyright_meta.refer }}" target="_blank" rel="noopener noreferrer">{{ i18n.copyright_refer }}</a></p>
+    </div>
+    {% endif %}
 {% endblock %}
 
 {% block extra_scripts %}

@@ -65,24 +65,10 @@
         <mdui-button-icon icon="more_vert" onclick="mdui.$('#about')[0].open = true"></mdui-button-icon>
       </mdui-top-app-bar>
 
-      <div style="padding-left: 5%; padding-right: 5%;" role="contentinfo">
+      <div style="padding-left: 5%; padding-right: 5%;">
           {% block content %}{% endblock %}
-          {% block copyright %}
-          {% if copyright %}
-            <mdui-divider></mdui-divider>
-            <br>
-            <div class="mdui-prose">
-                <p>{{ i18n.copyright.format(copyright.name) }}&nbsp;<a href="{{ copyright.refer }}" target="_blank" rel="noopener noreferrer">{{ i18n.copyright_refer }}</a></p>
-            </div>
-          <br>
-          {% endif %}
-          {% endblock %}
+          {% block copyright %}{% endblock %}
       </div>
-      
-      {% if config.icp %}
-      <div style="text-align: center;" class="mdui-prose"><a href="{{ config.icp.url }}" target="_blank" rel="noopener noreferrer">{{ config.icp.description }}</a></div>
-      <br>
-      {% endif %}
       <br>
 
       <mdui-dialog id="about" close-on-esc close-on-overlay-click style="text-align: center;">
@@ -98,7 +84,7 @@
             <span style="color: rgb(var(--mdui-color-outline)); font-size: small;">{{ i18n.powered_by_commit.format(commit_hash) }}</span><br>
             {% endif %}
             <br>{{ i18n.powered_by_desc }}
-            <div class="mdui-prose"><a href="https://github.com/0x24a/AmiaBlog" target="_blank" rel="noopener noreferrer">{{ i18n.github_repo }}</a></div>
+            <div class="mdui-prose"><mdui-button variant="text" end-icon="open_in_new" href="https://github.com/0x24a/AmiaBlog" target="_blank" rel="noopener noreferrer">{{ i18n.github_repo }}</mdui-button></div>
             {% if is_static %}
                 <br>{{ i18n.static_build_time.format(static_build_time) }}
             {% endif %}
@@ -113,5 +99,17 @@
       }
       mdui.setColorScheme('{{ config.site_settings.color_scheme }}')
       </script>
+      
+      <footer style="text-align: center; padding-top: 1em; padding-bottom: 1em;" role="contentinfo">
+          <p style="color: rgb(var(--mdui-color-outline)); font-size: small; margin: 0;">
+              &copy; {{ copyright_year }} {{ config.site_settings.title }}
+          </p>
+          {% if config.footer_text %}
+          <p style="color: rgb(var(--mdui-color-outline)); font-size: small; margin: 0;">{{ config.footer_text }}</p>
+          {% endif %}
+          {% if config.icp %}
+          <p style="font-size: small; margin: 0;"><a href="{{ config.icp.url }}" target="_blank" rel="noopener noreferrer" style="color: rgb(var(--mdui-color-outline));">{{ config.icp.description }}</a></p>
+          {% endif %}
+      </footer>
   </body>
 </html>
